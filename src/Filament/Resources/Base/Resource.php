@@ -35,6 +35,7 @@ use Amarenkov\MutableContent\Domain\Field\Lov\Type as DomainFieldType;
 use Amarenkov\MutableContent\Domain\Field\TypeSettings;
 use Amarenkov\MutableContent\Domain\LovRegistry;
 
+use Amarenkov\MutableContent\Helpers\DatabaseHelper;
 use Amarenkov\MutableContent\Helpers\ObjectHelper;
 
 use Amarenkov\MutableContent\ValueObjects\Density;
@@ -657,7 +658,7 @@ class Resource extends BaseResource
     {
         return $column
             ->sortable(query: fn (Builder $query, string $direction) => $query->orderBy('fields->'.$code, $direction))
-            ->searchable(query: fn (Builder $query, string $search) => $query->where('fields->'.$code, 'ilike', '%'.addcslashes($search, '%_\\').'%'));
+            ->searchable(query: fn (Builder $query, string $search) => DatabaseHelper::whereLike($query, 'fields->'.$code, '%'.addcslashes($search, '%_\\').'%'));
     }
 
     protected static function codeWithSystemMark($state, $record, Field $isSystemField): HtmlString

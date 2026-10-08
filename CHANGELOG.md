@@ -7,6 +7,10 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- MariaDB support: table search is case-insensitive through `DatabaseHelper::whereLike()`, and the usage table sorts by scope without `nulls last`.
+
 ## [0.3.0] - 2026-10-08
 
 ### Changed

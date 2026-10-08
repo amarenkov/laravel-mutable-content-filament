@@ -205,8 +205,10 @@ class UsageResource extends Resource
 
                 $cases = implode(' ', array_map(fn ($i) => 'WHEN ? THEN '.$i, array_keys($scopes)));
 
+                $last = $direction === 'desc' ? -1 : count($scopes);
+
                 return $query->orderByRaw(
-                    'CASE '.FieldUsageModels::CODE_SCOPE.' '.$cases.' END '.($direction === 'desc' ? 'desc' : 'asc').' nulls last',
+                    'CASE '.FieldUsageModels::CODE_SCOPE.' '.$cases.' ELSE '.$last.' END '.($direction === 'desc' ? 'desc' : 'asc'),
                     $scopes
                 );
             });

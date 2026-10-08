@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\DB;
 
 use Livewire\Livewire;
 
+use Amarenkov\MutableContent\Helpers\LogHelper;
+
 use Amarenkov\MutableContentFilament\Tests\TestCase;
 use Amarenkov\MutableContentFilament\Tests\Fixtures\Models\Owner;
 use Amarenkov\MutableContentFilament\Tests\Fixtures\Models\Record;
@@ -60,7 +62,7 @@ class RecordPagesTest extends TestCase
             ['code' => 'REC-1', 'quantity' => 3, 'weight' => 2.5, 'is_active' => true, 'due_date' => '2026-10-08', 'status' => 'draft', 'owner_id' => $owner->id],
             $record->fields->getArrayCopy()
         );
-        $this->assertSame($this->user->id, DB::table('logs.records')->where('entity_id', $record->id)->value('user_id'));
+        $this->assertSame($this->user->id, DB::table(LogHelper::getLogsTable(Record::class))->where('entity_id', $record->id)->value('user_id'));
     }
 
     public function test_create_validates_required_fields(): void
@@ -137,6 +139,6 @@ class RecordPagesTest extends TestCase
             ->callAction(TestAction::make('delete')->table($record));
 
         $this->assertSoftDeleted('records', ['id' => $record->id]);
-        $this->assertSame($this->user->id, DB::table('logs.records')->where('entity_id', $record->id)->where('is_deleted', true)->value('user_id'));
+        $this->assertSame($this->user->id, DB::table(LogHelper::getLogsTable(Record::class))->where('entity_id', $record->id)->where('is_deleted', true)->value('user_id'));
     }
 }
