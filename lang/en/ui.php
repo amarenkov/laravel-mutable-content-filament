@@ -1,0 +1,78 @@
+<?php
+
+return [
+    'navigation_group' => 'System settings',
+    'fields' => 'Fields',
+    'lovs' => 'LOVs',
+    'lov_items' => 'LOV items',
+    'lov_items_title' => 'Items of the :lov LOV',
+    'lov_delete_denied' => 'The LOV cannot be deleted',
+    'usage' => 'Usage',
+    'usage_title' => 'Usage of the :field field',
+    'usage_lov_helper' => 'The field will belong to the items of this LOV.',
+    'type' => 'Type',
+    'loading' => 'Loading…',
+    'yes' => 'Yes',
+    'no' => 'No',
+    'yes_lower' => 'yes',
+    'no_lower' => 'no',
+    'unlisted_code' => 'not in the LOV',
+    'unlisted_codes_filter' => 'Unlisted codes',
+
+    'filters' => [
+        'with_them' => 'Only with them',
+        'without_them' => 'Only without them',
+        'system_only' => 'System only',
+        'non_system_only' => 'Non-system only',
+    ],
+
+    'tabs' => [
+        'all' => 'All',
+        'unbound' => 'Unbound',
+        'quick_filters' => 'Quick filters',
+        'selected' => 'Selected: :label',
+        'classes' => 'Classes',
+    ],
+
+    'create_items' => [
+        'label' => 'Add as list',
+        'heading' => 'Add items as list',
+        'submit' => 'Add',
+        'labels' => 'Labels',
+        'labels_helper' => 'One label per line. Labels already in the LOV are skipped, deleted ones are restored, codes of the rest are transliterated from labels.',
+        'created' => 'Added: :count.',
+        'restored' => 'Restored: :count.',
+        'skipped' => 'Skipped (already in the LOV): :count — :labels.',
+        'done' => 'Items added',
+        'nothing' => 'Nothing to add',
+    ],
+
+    'settings' => [
+        'inherited' => 'As in the field: :value',
+        'display_unit' => 'Display unit',
+        'display_unit_helper' => 'The value is stored in ":unit" and entered and displayed in this unit.',
+        'link_by_code' => 'Link by code',
+        'link_by_code_helper' => 'The value is the object code, not the id. Cannot be changed for a field with data: stored values are not converted.',
+        'allow_unlisted_codes' => 'Allow unlisted codes',
+        'allow_unlisted_codes_helper' => 'A code missing from the LOV is accepted, stored as is and marked in the UI. Once an item with this code appears, the value links to it.',
+        'allow_unlisted_codes_object_helper' => 'A code with no matching object is accepted, stored as is and marked in the UI. Once an object with this code appears, the value links to it.',
+        'allow_zero' => 'Allow 0',
+        'allow_zero_helper' => 'If off, the value must be greater than zero.',
+
+        'describe' => [
+            'display_unit' => 'display in :unit',
+            'link_by_code' => 'link by code',
+            'link_by_id' => 'link by id',
+            'unlisted_codes' => 'unlisted codes',
+            'listed_codes_only' => 'listed codes only',
+            'allow_zero' => 'allow 0',
+            'no_zero' => 'no 0',
+        ],
+    ],
+
+    'save' => [
+        'duplicate' => 'Such a record already exists',
+        'duplicate_body' => 'A record with the same unique field values (e.g. code) already exists.',
+        'failed' => 'Not done',
+    ],
+];
