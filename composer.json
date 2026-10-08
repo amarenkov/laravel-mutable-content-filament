@@ -34,6 +34,11 @@
             "Amarenkov\\MutableContentFilament\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Amarenkov\\MutableContentFilament\\Tests\\": "tests/"
+        }
+    },
     "extra": {
         "laravel": {
             "providers": [
@@ -43,5 +48,14 @@
         "branch-alias": {
             "dev-master": "0.1.x-dev"
         }
+    },
+    "require-dev": {
+        "orchestra/testbench": "^11.0",
+        "phpunit/phpunit": "^12.0",
+        "larastan/larastan": "^3.0"
+    },
+    "scripts": {
+        "test": "phpunit",
+        "analyse": "phpstan analyse"
     }
 }

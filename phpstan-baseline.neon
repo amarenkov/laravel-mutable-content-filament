@@ -1,0 +1,97 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:setUpdatedBy\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Filament/Actions/DeleteAction.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:setUpdatedByIfDirty\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Filament/Actions/EditAction.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:setUpdatedByIfDirty\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Filament/Resources/Base/Pages/EditRecord.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:setUpdatedByIfDirty\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Filament/Resources/Base/Pages/ManageRecords.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Filament/Resources/Base/RelationManagers/RelationManager.php
+
+		-
+			message: '#^Call to an undefined method Amarenkov\\MutableContent\\ValueObjects\\HasUnits\:\:toFieldValue\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Filament/Resources/Base/Resource.php
+
+		-
+			message: '#^Call to an undefined static method Illuminate\\Database\\Eloquent\\Model\:\:getFieldDefinitions\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 3
+			path: src/Filament/Resources/Base/Resource.php
+
+		-
+			message: '#^Call to an undefined static method Illuminate\\Database\\Eloquent\\Model\:\:getFieldMaxLengths\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 2
+			path: src/Filament/Resources/Base/Resource.php
+
+		-
+			message: '#^Anonymous function has an unused use \$fieldTypeComponent\.$#'
+			identifier: closure.unusedUse
+			count: 1
+			path: src/Filament/Resources/Fields/FieldResource.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:code\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Filament/Resources/Fields/Resources/Usage/Pages/ManageUsage.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:label\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Filament/Resources/Fields/Resources/Usage/Pages/ManageUsage.php
+
+		-
+			message: '#^Call to an undefined static method Illuminate\\Database\\Eloquent\\Model\:\:getFieldDefinitions\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/Filament/Resources/Fields/Resources/Usage/UsageResource.php
+
+		-
+			message: '#^Cannot call static method getClassScope\(\) on int\|string\.$#'
+			identifier: staticMethod.nonObject
+			count: 1
+			path: src/Filament/Resources/Fields/Resources/Usage/UsageResource.php
+
+		-
+			message: '#^Anonymous function should return Amarenkov\\MutableContent\\Models\\Lov\\Lov but returns Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Filament/Resources/Lovs/Resources/Items/Pages/ManageItems.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:code\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Filament/Resources/Lovs/Resources/Items/Pages/ManageItems.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:label\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Filament/Resources/Lovs/Resources/Items/Pages/ManageItems.php
