@@ -60,18 +60,18 @@ Extend resources, pages and actions from this package instead of plain Filament 
 ```php
 use Amarenkov\MutableContentFilament\Filament\Resources\Base\Resource;
 
-class OrderResource extends Resource
+class ProjectResource extends Resource
 {
-    protected static ?string $model = Order::class;
+    protected static ?string $model = Project::class;
     protected static ?string $recordTitleAttribute = 'code';
 
     public static function getPages(): array
     {
         return [
-            'index'  => ListOrders::route('/'),
-            'create' => CreateOrder::route('/create'),
-            'view'   => ViewOrder::route('/{record}'),
-            'edit'   => EditOrder::route('/{record}/edit'),
+            'index'  => ListProjects::route('/'),
+            'create' => CreateProject::route('/create'),
+            'view'   => ViewProject::route('/{record}'),
+            'edit'   => EditProject::route('/{record}/edit'),
         ];
     }
 }
@@ -80,9 +80,9 @@ class OrderResource extends Resource
 ```php
 use Amarenkov\MutableContentFilament\Filament\Resources\Base\Pages\CreateRecord;
 
-class CreateOrder extends CreateRecord
+class CreateProject extends CreateRecord
 {
-    protected static string $resource = OrderResource::class;
+    protected static string $resource = ProjectResource::class;
 }
 ```
 
