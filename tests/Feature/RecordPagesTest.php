@@ -139,6 +139,6 @@ class RecordPagesTest extends TestCase
             ->callAction(TestAction::make('delete')->table($record));
 
         $this->assertSoftDeleted('records', ['id' => $record->id]);
-        $this->assertSame($this->user->id, DB::table(LogHelper::getLogsTable(Record::class))->where('entity_id', $record->id)->where('is_deleted', true)->value('user_id'));
+        $this->assertSame($this->user->id, DB::table(LogHelper::getLogsTable(Record::class))->where('entity_id', $record->id)->where('action', LogHelper::ACTION_DELETED)->value('user_id'));
     }
 }

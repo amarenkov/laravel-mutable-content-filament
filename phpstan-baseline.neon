@@ -1,25 +1,25 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:setUpdatedBy\(\)\.$#'
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:withLogContext\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: src/Filament/Actions/DeleteAction.php
 
 		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:setUpdatedByIfDirty\(\)\.$#'
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:withLogContext\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: src/Filament/Actions/EditAction.php
 
 		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:setUpdatedByIfDirty\(\)\.$#'
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:withLogContext\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: src/Filament/Resources/Base/Pages/EditRecord.php
 
 		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:setUpdatedByIfDirty\(\)\.$#'
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:withLogContext\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: src/Filament/Resources/Base/Pages/ManageRecords.php

@@ -25,7 +25,7 @@ class EditAction extends BaseEditAction
             })
             ->using(function (Model $record, array $data): Model {
                 $record->fill($data);
-                $record->setUpdatedByIfDirty(RequestHelper::getPath().'/edit', auth()->id());
+                $record->withLogContext(RequestHelper::getPath().'/edit')->user(auth()->id());
                 SaveHelper::save(fn () => $record->save());
 
                 return $record;

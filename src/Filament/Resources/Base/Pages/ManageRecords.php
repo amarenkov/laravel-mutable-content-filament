@@ -40,7 +40,7 @@ class ManageRecords extends BaseManageRecords
                     $record = $this->makeRecord($model);
 
                     $record->fill($data);
-                    $record->setUpdatedByIfDirty(RequestHelper::getPath().'/create', auth()->id());
+                    $record->withLogContext(RequestHelper::getPath().'/create')->user(auth()->id());
 
                     return SaveHelper::save(function () use ($record) {
                         if ($parentRecord = $this->getParentRecord()) {

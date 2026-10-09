@@ -22,7 +22,7 @@ class CreateRecord extends BaseCreateRecord
             : new ($this->getModel())();
 
         $record->fill($data);
-        $record->setUpdatedByIfDirty(RequestHelper::getPath(), auth()->id());
+        $record->withLogContext(RequestHelper::getPath())->user(auth()->id());
 
         return SaveHelper::save(function () use ($record, $parentRecord) {
             if ($parentRecord) {

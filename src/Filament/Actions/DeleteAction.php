@@ -20,7 +20,7 @@ class DeleteAction extends BaseDeleteAction
                 return $record && $record->isSystem();
             })
             ->using(function (Model $record): Model {
-                $record->setUpdatedBy(RequestHelper::getPath().'/destroy', auth()->id());
+                $record->withLogContext(RequestHelper::getPath().'/destroy')->user(auth()->id());
 
                 SaveHelper::save(fn () => $record->delete());
 

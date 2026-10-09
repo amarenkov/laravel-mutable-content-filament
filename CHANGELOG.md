@@ -7,6 +7,10 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Pages and actions set the change log author and comment with `withLogContext()` instead of `setUpdatedByIfDirty()`, removed in the core 0.5.
+
 ## [0.4.0] - 2026-10-09
 
 ### Added
