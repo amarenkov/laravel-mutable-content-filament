@@ -7,8 +7,11 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-09
+
 ### Changed
 
+- Requires `amarenkov/laravel-mutable-content` ^0.5.
 - Pages and actions set the change log author and comment with `withLogContext()` instead of `setUpdatedByIfDirty()`, removed in the core 0.5.
 
 ## [0.4.0] - 2026-10-09
@@ -37,7 +40,8 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial release.
 
-[Unreleased]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.1.0...v0.2.0
