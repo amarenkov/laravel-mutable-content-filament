@@ -7,6 +7,7 @@ use InvalidArgumentException;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\ComponentAttributeBag;
 
@@ -71,6 +72,18 @@ class Resource extends BaseResource
         }
 
         return parent::getModelLabel();
+    }
+
+    /**
+     * The class label is pluralized in English only: Str::plural() knows no other language.
+     */
+    public static function getPluralModelLabel(): string
+    {
+        if (static::$pluralModelLabel === null && static::getPluralLabel() === null && static::$modelLabel === null && static::getLabel() === null && ($label = static::classLabel()) !== null) {
+            return str_starts_with(app()->getLocale(), 'en') ? Str::plural($label) : $label;
+        }
+
+        return parent::getPluralModelLabel();
     }
 
     protected static function classLabel(): ?string

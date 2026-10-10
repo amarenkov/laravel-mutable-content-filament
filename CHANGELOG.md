@@ -7,6 +7,10 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- A class label in a language other than English got an English plural ending ("Заказs"); outside English it is used as is.
+
 ## [0.6.0] - 2026-10-10
 
 ### Changed

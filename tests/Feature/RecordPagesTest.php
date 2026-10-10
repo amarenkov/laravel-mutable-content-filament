@@ -43,6 +43,10 @@ class RecordPagesTest extends TestCase
     {
         $this->assertSame('Record', RecordResource::getModelLabel());
         $this->assertSame('Records', RecordResource::getPluralModelLabel());
+
+        $this->app->setLocale('ru');
+
+        $this->assertSame('Record', RecordResource::getPluralModelLabel());
     }
 
     public function test_create_saves_fields_and_logs_the_author(): void
