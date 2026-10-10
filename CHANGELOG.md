@@ -7,8 +7,11 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-10
+
 ### Changed
 
+- Requires `amarenkov/laravel-mutable-content` ^0.6.
 - A resource without its own model label takes the model's class label (`#[ClassLabel]`) instead of one made from the class name.
 - Measurements are formatted with the separators of the current locale (core `NumberHelper`).
 
@@ -55,7 +58,8 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial release.
 
-[Unreleased]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.5.1...HEAD
+[Unreleased]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.3.0...v0.4.0
