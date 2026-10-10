@@ -7,8 +7,11 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-10
+
 ### Changed
 
+- Requires `amarenkov/laravel-mutable-content` ^0.7.
 - A field usage is bound to a class and optionally to one of its types (core 0.7 class types) instead of a class or a LOV: the type select lists the types of the chosen class, the LOV items are the `Item` class typed by LOV. Usage titles, the usage column and filter show the type, quick filters on the fields screen have a group per typed class.
 
 ## [0.6.1] - 2026-10-10
@@ -68,7 +71,8 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial release.
 
-[Unreleased]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.6.1...HEAD
+[Unreleased]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.6.1...v0.7.0
 [0.6.1]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.5.0...v0.5.1
