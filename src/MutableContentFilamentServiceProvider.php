@@ -36,6 +36,7 @@ class MutableContentFilamentServiceProvider extends ServiceProvider
             DomainFieldType::TYPE_AREA => Heroicon::OutlinedSquare2Stack,
             DomainFieldType::TYPE_VOLUME => Heroicon::OutlinedCubeTransparent,
             DomainFieldType::TYPE_DATE => Heroicon::OutlinedCalendar,
+            DomainFieldType::TYPE_DATETIME => Heroicon::OutlinedClock,
             DomainFieldType::TYPE_ICON => Heroicon::OutlinedPhoto,
             DomainFieldType::TYPE_SYSTEM => Heroicon::OutlinedCog6Tooth,
         ];

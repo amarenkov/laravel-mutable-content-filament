@@ -24,6 +24,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Support\Enums\IconSize;
@@ -54,6 +55,8 @@ class Resource extends BaseResource
 {
     // const
     protected const DATE_DISPLAY_FORMAT = 'd.m.Y';
+
+    protected const DATETIME_DISPLAY_FORMAT = 'd.m.Y H:i';
 
     protected const UNLISTED_CODE_HINT = 'mutable-content-filament::ui.unlisted_code';
 
@@ -180,6 +183,17 @@ class Resource extends BaseResource
                         ->format('Y-m-d');
                     break;
 
+                case DomainFieldType::TYPE_DATETIME:
+                    $component = DateTimePicker::make($field->code)
+                        ->native(false)
+                        ->seconds(false)
+                        ->timezone(config('app.timezone'))
+                        ->displayFormat(static::DATETIME_DISPLAY_FORMAT)
+                        ->format('Y-m-d H:i:s')
+                        ->formatStateUsing(fn ($record) => $record instanceof ModelWithFields ? $record->getDateTime($field->code)?->format('Y-m-d H:i:s') : null)
+                        ->dehydrateStateUsing(fn ($state) => ModelWithFields::toDateTimeValue($state));
+                    break;
+
                 case DomainFieldType::TYPE_DENSITY:
                     $component = TextInput::make($field->code)
                         ->numeric()
@@ -273,6 +287,10 @@ class Resource extends BaseResource
 
                 case DomainFieldType::TYPE_DATE:
                     $component = TextEntry::make($field->code)->date(static::DATE_DISPLAY_FORMAT);
+                    break;
+
+                case DomainFieldType::TYPE_DATETIME:
+                    $component = TextEntry::make($field->code)->state(fn ($record) => $record instanceof ModelWithFields ? $record->getDateTime($field->code)?->format(static::DATETIME_DISPLAY_FORMAT) : null);
                     break;
 
                 case DomainFieldType::TYPE_ICON:
@@ -389,6 +407,10 @@ class Resource extends BaseResource
 
                 case DomainFieldType::TYPE_DATE:
                     $column = TextColumn::make($field->code)->date(static::DATE_DISPLAY_FORMAT);
+                    break;
+
+                case DomainFieldType::TYPE_DATETIME:
+                    $column = TextColumn::make($field->code)->state(fn ($record) => $record instanceof ModelWithFields ? $record->getDateTime($field->code)?->format(static::DATETIME_DISPLAY_FORMAT) : null);
                     break;
 
                 case DomainFieldType::TYPE_ICON:
