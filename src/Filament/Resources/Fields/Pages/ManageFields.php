@@ -13,12 +13,11 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Support\Enums\Size;
 
-use Amarenkov\MutableContent\Domain\LovRegistry;
 use Amarenkov\MutableContent\Domain\MutableClassRegistry;
 
 use Amarenkov\MutableContent\Models\Field\Field as FieldModel;
 use Amarenkov\MutableContent\Models\Field\Usage as FieldUsageModels;
-use Amarenkov\MutableContent\Models\Lov\Item as LovItem;
+use Amarenkov\MutableContent\Models\ModelWithFields;
 
 use Amarenkov\MutableContentFilament\Filament\Resources\Base\Pages\ManageRecords;
 
@@ -27,12 +26,15 @@ use Amarenkov\MutableContentFilament\Filament\Resources\Fields\FieldResource;
 class ManageFields extends ManageRecords
 {
     // const
-    const LOV_TAB_PREFIX = 'lov-';
+    const TYPE_TAB_PREFIX = 'type-';
 
     // static
     protected static string $resource = FieldResource::class;
 
     // protected
+    /** @var array<string, array{class: string, label: string}> type tab key => class and its label */
+    protected array $typeTabGroups = [];
+
     protected static function boundTo(Builder $query, string $mutableClass): Builder
     {
         return $query->whereHas('usages', function (Builder $query) use ($mutableClass) {
@@ -40,10 +42,13 @@ class ManageFields extends ManageRecords
         });
     }
 
-    protected static function boundToLov(Builder $query, string $lovCode): Builder
+    /**
+     * @param class-string<ModelWithFields> $mutableClass
+     */
+    protected static function boundToType(Builder $query, string $mutableClass, string $typeCode): Builder
     {
-        return $query->whereHas('usages', function (Builder $query) use ($lovCode) {
-            $query->whereIn(FieldUsageModels::CODE_SCOPE, LovItem::getFieldScopesForLov($lovCode));
+        return $query->whereHas('usages', function (Builder $query) use ($mutableClass, $typeCode) {
+            $query->whereIn(FieldUsageModels::CODE_SCOPE, $mutableClass::getFieldScopesForType($typeCode));
         });
     }
 
@@ -80,15 +85,24 @@ class ManageFields extends ManageRecords
                 ->badge(fn () => static::boundTo(FieldModel::query(), $mutableClass)->count());
         }
 
-        $lovs = app(LovRegistry::class)->getLovsOptions() ?? [];
-        uasort($lovs, fn ($a, $b) => mb_strtolower((string)$a) <=> mb_strtolower((string)$b));
+        $this->typeTabGroups = [];
 
-        foreach ($lovs as $lovCode => $lovLabel) {
-            $lovCode = (string)$lovCode;
+        foreach ($mcds as $mcd) {
+            $mutableClass = $mcd->mutableClass;
 
-            $tabs[self::LOV_TAB_PREFIX.Str::slug($lovCode)] = Tab::make((string)$lovLabel)
-                ->modifyQueryUsing(fn (Builder $query) => static::boundToLov($query, $lovCode))
-                ->badge(fn () => static::boundToLov(FieldModel::query(), $lovCode)->count());
+            $types = $mutableClass::getTypeOptions();
+            uasort($types, fn ($a, $b) => mb_strtolower((string)$a) <=> mb_strtolower((string)$b));
+
+            foreach ($types as $typeCode => $typeLabel) {
+                $typeCode = (string)$typeCode;
+                $key = self::TYPE_TAB_PREFIX.Str::slug(str_replace('\\', '-', $mutableClass)).'-'.Str::slug($typeCode);
+
+                $this->typeTabGroups[$key] = ['class' => $mutableClass, 'label' => $mcd->label];
+
+                $tabs[$key] = Tab::make((string)$typeLabel)
+                    ->modifyQueryUsing(fn (Builder $query) => static::boundToType($query, $mutableClass, $typeCode))
+                    ->badge(fn () => static::boundToType(FieldModel::query(), $mutableClass, $typeCode)->count());
+            }
         }
 
         $tabs['unbound'] = Tab::make(__('mutable-content-filament::ui.tabs.unbound'))
@@ -102,7 +116,7 @@ class ManageFields extends ManageRecords
     {
         $common = [];
         $classes = [];
-        $lovs = [];
+        $types = [];
 
         $filterTabLabels = [];
 
@@ -111,8 +125,8 @@ class ManageFields extends ManageRecords
 
             if (in_array($key, ['all', 'unbound'], true)) {
                 $common[] = $this->tabButton($key, $tab);
-            } elseif (str_starts_with($key, self::LOV_TAB_PREFIX)) {
-                $lovs[] = $this->tabButton($key, $tab);
+            } elseif (isset($this->typeTabGroups[$key])) {
+                $types[$this->typeTabGroups[$key]['class']][] = $this->tabButton($key, $tab);
             } else {
                 $classes[] = $this->tabButton($key, $tab);
             }
@@ -135,9 +149,11 @@ class ManageFields extends ManageRecords
                         ->label(__('mutable-content-filament::ui.tabs.classes'))
                         ->hidden(empty($classes)),
 
-                    Actions::make($lovs)
-                        ->label(__('mutable-content-filament::ui.lovs'))
-                        ->hidden(empty($lovs)),
+                    ...array_map(
+                        fn (string $mutableClass) => Actions::make($types[$mutableClass])
+                            ->label(app(MutableClassRegistry::class)->getKeyValuePairs()[$mutableClass] ?? $mutableClass),
+                        array_keys($types)
+                    ),
                 ])
                 ->collapsed(fn () => $activeFilterTabLabel() === null)
                 ->compact(),

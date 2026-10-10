@@ -28,7 +28,7 @@ class ItemResource extends Resource
     {
         $lov = $livewire && method_exists($livewire, 'getParentRecord') ? $livewire->getParentRecord() : null;
 
-        return $lov ? LovItemModels::getFieldScopesForLov($lov->code()) : null;
+        return $lov ? LovItemModels::getFieldScopesForType($lov->code()) : null;
     }
 
     protected static function getLovCode(mixed $livewire): ?string

@@ -73,12 +73,6 @@ parameters:
 			path: src/Filament/Resources/Fields/Resources/Usage/UsageResource.php
 
 		-
-			message: '#^Cannot call static method getClassScope\(\) on int\|string\.$#'
-			identifier: staticMethod.nonObject
-			count: 1
-			path: src/Filament/Resources/Fields/Resources/Usage/UsageResource.php
-
-		-
 			message: '#^Anonymous function should return Amarenkov\\MutableContent\\Models\\Lov\\Lov but returns Illuminate\\Database\\Eloquent\\Model\|null\.$#'
 			identifier: return.type
 			count: 1
