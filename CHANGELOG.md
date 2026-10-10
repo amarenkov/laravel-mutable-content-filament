@@ -7,6 +7,8 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-10-10
+
 ### Changed
 
 - Field type icons are kept in the package (`IconHelper::addLovItemIcons()`, `IconHelper::lovItemIcon()`) instead of the core LOV registry, so another UI package can have its own ones. An icon set for the item in the admin panel still takes precedence when it is a Heroicon.
@@ -48,7 +50,8 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial release.
 
-[Unreleased]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.2.0...v0.3.0
