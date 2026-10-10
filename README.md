@@ -10,6 +10,26 @@ A Filament 5 admin panel for
 Builds forms, infolists and tables from model field definitions and makes sure every change made
 in the admin panel lands in the change log with its author.
 
+## Screenshots
+
+A demo bicycle catalog. Nothing below is written by hand: the resources only set the model.
+
+**Table** built from the field definitions: LOV items with icons, object titles, weight and lengths in their display units. "Gears" and "Color" were added in the admin panel.
+
+![Bicycles table](https://raw.githubusercontent.com/amarenkov/laravel-mutable-content-filament/main/art/bicycles.png)
+
+**Form**: a select with icons for a LOV item, a searchable select for an object reference, inputs in display units.
+
+![Bicycle form](https://raw.githubusercontent.com/amarenkov/laravel-mutable-content-filament/main/art/edit.png)
+
+**Fields** of a class: the lock marks fields declared in code, which cannot be deleted; fields added in the admin panel can.
+
+![Fields screen](https://raw.githubusercontent.com/amarenkov/laravel-mutable-content-filament/main/art/fields.png)
+
+**Lists of values**: items with icons, added one by one or as a list of labels.
+
+![LOV items screen](https://raw.githubusercontent.com/amarenkov/laravel-mutable-content-filament/main/art/lov-items.png)
+
 ## Features
 
 - **Forms and tables from field definitions.** The component is chosen by field type: a toggle

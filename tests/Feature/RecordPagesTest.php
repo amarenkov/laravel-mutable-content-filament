@@ -13,6 +13,7 @@ use Amarenkov\MutableContent\Helpers\LogHelper;
 use Amarenkov\MutableContentFilament\Tests\TestCase;
 use Amarenkov\MutableContentFilament\Tests\Fixtures\Models\Owner;
 use Amarenkov\MutableContentFilament\Tests\Fixtures\Models\Record;
+use Amarenkov\MutableContentFilament\Tests\Fixtures\Resources\Records\RecordResource;
 use Amarenkov\MutableContentFilament\Tests\Fixtures\Resources\Records\Pages\CreateRecordPage;
 use Amarenkov\MutableContentFilament\Tests\Fixtures\Resources\Records\Pages\EditRecordPage;
 use Amarenkov\MutableContentFilament\Tests\Fixtures\Resources\Records\Pages\ListRecordsPage;
@@ -36,6 +37,12 @@ class RecordPagesTest extends TestCase
         $record->save();
 
         return $record;
+    }
+
+    public function test_model_label_comes_from_the_class_label(): void
+    {
+        $this->assertSame('Record', RecordResource::getModelLabel());
+        $this->assertSame('Records', RecordResource::getPluralModelLabel());
     }
 
     public function test_create_saves_fields_and_logs_the_author(): void
@@ -128,7 +135,7 @@ class RecordPagesTest extends TestCase
             ->assertOk()
             ->assertSee('Owner Two')
             ->assertSee('Active')
-            ->assertSee('1,25 kg');
+            ->assertSee('1.25 kg');
     }
 
     public function test_delete_soft_deletes_and_logs_the_author(): void

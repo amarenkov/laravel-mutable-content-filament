@@ -34,9 +34,12 @@ use Amarenkov\MutableContent\Domain\Field\Field;
 use Amarenkov\MutableContent\Domain\Field\Lov\Type as DomainFieldType;
 use Amarenkov\MutableContent\Domain\Field\TypeSettings;
 use Amarenkov\MutableContent\Domain\LovRegistry;
+use Amarenkov\MutableContent\Domain\MutableClassDescription;
 
 use Amarenkov\MutableContent\Helpers\DatabaseHelper;
 use Amarenkov\MutableContent\Helpers\ObjectHelper;
+
+use Amarenkov\MutableContent\Models\ModelWithFields;
 
 use Amarenkov\MutableContent\ValueObjects\Density;
 use Amarenkov\MutableContent\ValueObjects\SurfaceDensity;
@@ -57,6 +60,33 @@ class Resource extends BaseResource
     protected static ?string $recordTitleAttribute = Field::COMMON_CODE_LABEL;
 
     protected static bool $hasTitleCaseModelLabel = false;
+
+    /**
+     * The model's class label (#[ClassLabel]) unless the resource sets its own.
+     */
+    public static function getModelLabel(): string
+    {
+        if (static::$modelLabel === null && static::getLabel() === null && ($label = static::classLabel()) !== null) {
+            return $label;
+        }
+
+        return parent::getModelLabel();
+    }
+
+    protected static function classLabel(): ?string
+    {
+        $model = static::getModel();
+
+        if (!is_subclass_of($model, ModelWithFields::class)) {
+            return null;
+        }
+
+        try {
+            return new MutableClassDescription($model)->label;
+        } catch (InvalidArgumentException) {
+            return null;
+        }
+    }
 
     /**
      * Field usage scopes of the page (see ModelWithFields::getFieldScopes()); null for the class ones.

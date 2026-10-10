@@ -7,6 +7,11 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- A resource without its own model label takes the model's class label (`#[ClassLabel]`) instead of one made from the class name.
+- Measurements are formatted with the separators of the current locale (core `NumberHelper`).
+
 ## [0.5.1] - 2026-10-10
 
 ### Changed
