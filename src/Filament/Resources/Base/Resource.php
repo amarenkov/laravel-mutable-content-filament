@@ -6,6 +6,7 @@ use Closure;
 use InvalidArgumentException;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -187,11 +188,11 @@ class Resource extends BaseResource
                     $component = DateTimePicker::make($field->code)
                         ->native(false)
                         ->seconds(false)
-                        ->timezone(config('app.timezone'))
+                        ->timezone(ModelWithFields::displayTimezone())
                         ->displayFormat(static::DATETIME_DISPLAY_FORMAT)
                         ->format('Y-m-d H:i:s')
-                        ->formatStateUsing(fn ($record) => $record instanceof ModelWithFields ? $record->getDateTime($field->code)?->format('Y-m-d H:i:s') : null)
-                        ->dehydrateStateUsing(fn ($state) => ModelWithFields::toDateTimeValue($state));
+                        ->formatStateUsing(fn ($record) => $record instanceof ModelWithFields ? $record->getDateTime($field->code)?->setTimezone(config('app.timezone'))->format('Y-m-d H:i:s') : null)
+                        ->dehydrateStateUsing(fn ($state) => filled($state) ? Carbon::parse($state, config('app.timezone'))->utc()->format(ModelWithFields::DATETIME_FORMAT) : null);
                     break;
 
                 case DomainFieldType::TYPE_DENSITY:

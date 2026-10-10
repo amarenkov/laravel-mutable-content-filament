@@ -7,6 +7,11 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Date and time fields are shown in `mutable-content.timezone`; the form state stays in the application timezone, as Filament expects.
+- Requires `amarenkov/laravel-mutable-content` ^0.7.3.
+
 ## [0.7.1] - 2026-10-10
 
 ### Added

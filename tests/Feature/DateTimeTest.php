@@ -22,7 +22,7 @@ class DateTimeTest extends TestCase
     {
         parent::defineEnvironment($app);
 
-        $app['config']->set('app.timezone', 'Europe/Moscow');
+        $app['config']->set('mutable-content.timezone', 'Europe/Moscow');
     }
 
     public function test_date_and_time_is_entered_and_shown_in_the_application_timezone(): void
@@ -50,6 +50,6 @@ class DateTimeTest extends TestCase
         Livewire::test(ManageItems::class, ['parentRecord' => $lov])
             ->assertTableColumnStateSet('happened_at', '10.10.2026 12:00', $item)
             ->mountAction(TestAction::make('edit')->table($item))
-            ->assertSchemaStateSet(['happened_at' => '2026-10-10 12:00:00']);
+            ->assertSchemaStateSet(['happened_at' => '2026-10-10 09:00:00']);
     }
 }
