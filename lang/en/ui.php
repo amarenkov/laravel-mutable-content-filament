@@ -16,6 +16,7 @@ return [
     'no' => 'No',
     'yes_lower' => 'yes',
     'no_lower' => 'no',
+    'default_icon' => 'Default: :icon',
     'unlisted_code' => 'not in the LOV',
     'unlisted_codes_filter' => 'Unlisted codes',
 

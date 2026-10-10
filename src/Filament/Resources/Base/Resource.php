@@ -459,7 +459,7 @@ class Resource extends BaseResource
         $options = [];
 
         foreach ($lovRegistry->getLovItemsOptions($field->lovCode) as $code => $label) {
-            $icon = IconHelper::getIcon($lovRegistry->getLovItemIcon($field->lovCode, $code));
+            $icon = IconHelper::lovItemIcon($field->lovCode, $code);
             $withIcons = $withIcons || $icon !== null;
 
             $options[$code] = [$label, $icon];
@@ -511,7 +511,7 @@ class Resource extends BaseResource
         if ($lovRegistry->hasLovItem($field->lovCode, $state)) {
             $label = $lovRegistry->getLovItemLabel($field->lovCode, $state);
 
-            if ($icon = IconHelper::getIcon($lovRegistry->getLovItemIcon($field->lovCode, $state))) {
+            if ($icon = IconHelper::lovItemIcon($field->lovCode, $state)) {
                 return new HtmlString('<span style="display: inline-flex; align-items: center; gap: 0.375rem;">'.generate_icon_html($icon, size: IconSize::Small)?->toHtml().e((string)$label).'</span>');
             }
 

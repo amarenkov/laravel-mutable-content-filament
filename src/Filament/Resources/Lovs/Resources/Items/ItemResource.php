@@ -7,6 +7,8 @@ use Filament\Tables\Table;
 use Amarenkov\MutableContent\Domain\Field\Field;
 use Amarenkov\MutableContent\Models\Lov\Item as LovItemModels;
 
+use Amarenkov\MutableContentFilament\Helpers\IconHelper;
+
 use Amarenkov\MutableContentFilament\Filament\Resources\Base\Resource;
 use Amarenkov\MutableContentFilament\Filament\Resources\Lovs\LovResource;
 use Amarenkov\MutableContentFilament\Filament\Resources\Lovs\Resources\Items\Pages\ManageItems;
@@ -27,6 +29,42 @@ class ItemResource extends Resource
         $lov = $livewire && method_exists($livewire, 'getParentRecord') ? $livewire->getParentRecord() : null;
 
         return $lov ? LovItemModels::getFieldScopesForLov($lov->code()) : null;
+    }
+
+    protected static function getLovCode(mixed $livewire): ?string
+    {
+        $lov = $livewire && method_exists($livewire, 'getParentRecord') ? $livewire->getParentRecord() : null;
+
+        return $lov?->code();
+    }
+
+    protected static function formComponentsFromFields(?array $scopes = null)
+    {
+        $components = parent::formComponentsFromFields($scopes);
+
+        if (isset($components[LovItemModels::CODE_ICON])) {
+            $components[LovItemModels::CODE_ICON]->placeholder(function (?LovItemModels $record, $livewire) {
+                $lovCode = static::getLovCode($livewire);
+                $default = $record && $lovCode ? IconHelper::lovItemDefaultIcon($lovCode, $record->code()) : null;
+
+                return $default ? __('mutable-content-filament::ui.default_icon', ['icon' => $default->value]) : null;
+            });
+        }
+
+        return $components;
+    }
+
+    protected static function tableFromFields(Table $table, ?array $scopes = null)
+    {
+        $table = parent::tableFromFields($table, $scopes);
+
+        $table->getColumn(LovItemModels::CODE_ICON)?->state(function (LovItemModels $record, $livewire) {
+            $lovCode = static::getLovCode($livewire);
+
+            return $lovCode ? IconHelper::lovItemIcon($lovCode, $record->code())?->value : $record->{LovItemModels::CODE_ICON};
+        });
+
+        return $table;
     }
 
     public static function table(Table $table): Table

@@ -152,7 +152,7 @@ class FieldResource extends Resource
 
                 $html = e($result);
 
-                if ($icon = IconHelper::getIcon($lovRegistry->getLovItemIcon(FieldType::CLASS_CODE, $fieldType))) {
+                if ($icon = IconHelper::lovItemIcon(FieldType::CLASS_CODE, $fieldType)) {
                     $html = '<span style="display: inline-flex; align-items: center; gap: 0.375rem;">'.generate_icon_html($icon, size: IconSize::Small)?->toHtml().$html.'</span>';
                 }
 

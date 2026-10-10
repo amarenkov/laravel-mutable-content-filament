@@ -7,6 +7,8 @@ use Filament\Support\Icons\Heroicon;
 
 use function Filament\Support\generate_icon_html;
 
+use Amarenkov\MutableContent\Domain\LovRegistry;
+
 /**
  * Icon field value: a Heroicon name as Filament writes it, "o-cube" (outlined) or "cube" (solid).
  */
@@ -16,6 +18,32 @@ class IconHelper
     public const OPTIONS_LIMIT = 50;
 
     // static
+    /** @var array<string, array<string|int, Heroicon>> */
+    protected static array $lovItemIcons = [];
+
+    /**
+     * Default icons of LOV items, shown when the item has no valid icon of its own (from the code or the admin panel).
+     *
+     * @param array<string|int, Heroicon> $icons item code => icon
+     */
+    public static function addLovItemIcons(string $lovCode, array $icons): void
+    {
+        static::$lovItemIcons[$lovCode] = $icons + (static::$lovItemIcons[$lovCode] ?? []);
+    }
+
+    /**
+     * Icon of a LOV item: its own one if it is a Heroicon, the default otherwise.
+     */
+    public static function lovItemIcon(string $lovCode, mixed $code): ?Heroicon
+    {
+        return static::getIcon(app(LovRegistry::class)->getLovItemIcon($lovCode, $code)) ?? static::lovItemDefaultIcon($lovCode, $code);
+    }
+
+    public static function lovItemDefaultIcon(string $lovCode, mixed $code): ?Heroicon
+    {
+        return is_string($code) || is_int($code) ? (static::$lovItemIcons[$lovCode][$code] ?? null) : null;
+    }
+
     /**
      * @return array<string>
      */

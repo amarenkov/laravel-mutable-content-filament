@@ -6,9 +6,9 @@ use Illuminate\Support\ServiceProvider;
 
 use Filament\Support\Icons\Heroicon;
 
-use Amarenkov\MutableContent\Domain\LovRegistry;
-
 use Amarenkov\MutableContent\Domain\Field\Lov\Type as DomainFieldType;
+
+use Amarenkov\MutableContentFilament\Helpers\IconHelper;
 
 class MutableContentFilamentServiceProvider extends ServiceProvider
 {
@@ -44,9 +44,7 @@ class MutableContentFilamentServiceProvider extends ServiceProvider
     // public
     public function register(): void
     {
-        $this->callAfterResolving(LovRegistry::class, function (LovRegistry $lovRegistry) {
-            $lovRegistry->addItemIcons(DomainFieldType::CLASS_CODE, array_map(fn (Heroicon $icon) => $icon->value, $this->fieldTypeIcons()));
-        });
+        IconHelper::addLovItemIcons(DomainFieldType::CLASS_CODE, $this->fieldTypeIcons());
     }
 
     public function boot(): void

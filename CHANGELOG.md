@@ -7,6 +7,14 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Field type icons are kept in the package (`IconHelper::addLovItemIcons()`, `IconHelper::lovItemIcon()`) instead of the core LOV registry, so another UI package can have its own ones. An icon set for the item in the admin panel still takes precedence when it is a Heroicon.
+
+### Added
+
+- LOV items show their default icon in the table and as the icon field placeholder.
+
 ## [0.5.0] - 2026-10-09
 
 ### Changed

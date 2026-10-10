@@ -16,6 +16,7 @@ return [
     'no' => 'Нет',
     'yes_lower' => 'да',
     'no_lower' => 'нет',
+    'default_icon' => 'По умолчанию: :icon',
     'unlisted_code' => 'нет в справочнике',
     'unlisted_codes_filter' => 'Коды не из справочника',
 
