@@ -1,6 +1,6 @@
 {
     "name": "amarenkov/laravel-mutable-content-filament",
-    "description": "Filament admin panel integration for amarenkov/laravel-mutable-content",
+    "description": "Filament 5 admin panel for laravel-mutable-content: forms and tables built from field definitions, screens to manage fields and lists of values, change log authorship.",
     "type": "library",
     "keywords": [
         "laravel",
@@ -9,7 +9,8 @@
         "jsonb",
         "dynamic-fields",
         "custom-fields",
-        "admin"
+        "admin",
+        "filament-plugin"
     ],
     "homepage": "https://github.com/amarenkov/laravel-mutable-content-filament",
     "license": "MIT",

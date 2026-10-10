@@ -2,6 +2,7 @@
 
 [![tests](https://github.com/amarenkov/laravel-mutable-content-filament/actions/workflows/tests.yml/badge.svg)](https://github.com/amarenkov/laravel-mutable-content-filament/actions/workflows/tests.yml)
 [![Packagist](https://img.shields.io/packagist/v/amarenkov/laravel-mutable-content-filament)](https://packagist.org/packages/amarenkov/laravel-mutable-content-filament)
+![coverage](https://img.shields.io/badge/coverage-76%25-yellowgreen)
 
 A Filament 5 admin panel for
 [`amarenkov/laravel-mutable-content`](https://github.com/amarenkov/laravel-mutable-content).
