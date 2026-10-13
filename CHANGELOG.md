@@ -7,6 +7,16 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Money fields: a fieldset with the amount and the currency (a select of the `currency` LOV, or a hidden fixed currency shown as the amount suffix), validated by the core money rule; the column and the infolist show the amount with the currency symbol. Icon `OutlinedBanknotes`.
+- Field type settings: «Allow negative values» and «Allow 0» for number and measurement types, with the default of the type (on for numbers and money, off for measurements); «Currency» for money. `describe()` shows them.
+
+### Changed
+
+- Number and measurement inputs follow the `allow_negative` and `allow_zero` settings (`RuleHelper::getSignRules()`); measurements no longer have a fixed minimum of 0.
+- Requires `amarenkov/laravel-mutable-content` ^0.7.5.
+
 ## [0.7.2] - 2026-10-10
 
 ### Changed

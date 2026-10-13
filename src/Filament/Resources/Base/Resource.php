@@ -26,6 +26,9 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Hidden;
+use Filament\Schemas\Components\Fieldset;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Support\Enums\IconSize;
@@ -41,10 +44,14 @@ use Amarenkov\MutableContent\Domain\MutableClassDescription;
 
 use Amarenkov\MutableContent\Helpers\DatabaseHelper;
 use Amarenkov\MutableContent\Helpers\ObjectHelper;
+use Amarenkov\MutableContent\Helpers\RuleHelper;
 
 use Amarenkov\MutableContent\Models\ModelWithFields;
+use Amarenkov\MutableContent\Models\Lov\Currency;
+use Amarenkov\MutableContent\Rules\Money as MoneyRule;
 
 use Amarenkov\MutableContent\ValueObjects\Density;
+use Amarenkov\MutableContent\ValueObjects\Money;
 use Amarenkov\MutableContent\ValueObjects\SurfaceDensity;
 
 use Amarenkov\MutableContentFilament\Helpers\IconHelper;
@@ -145,13 +152,13 @@ class Resource extends BaseResource
                     break;
 
                 case DomainFieldType::TYPE_FLOAT:
-                    $component = TextInput::make($field->code)
+                    $component = static::withSignRules(TextInput::make($field->code)
                         ->numeric()
-                        ->step('any');
+                        ->step('any'), $field);
                     break;
 
                 case DomainFieldType::TYPE_INT:
-                    $component = TextInput::make($field->code)->integer();
+                    $component = static::withSignRules(TextInput::make($field->code)->integer(), $field);
                     break;
 
                 case DomainFieldType::TYPE_LOV:
@@ -196,20 +203,29 @@ class Resource extends BaseResource
                     break;
 
                 case DomainFieldType::TYPE_DENSITY:
-                    $component = TextInput::make($field->code)
+                    $component = static::withSignRules(TextInput::make($field->code)
                         ->numeric()
-                        ->rule(TypeSettings::allowsZero($field) ? 'min:0' : 'gt:0')
                         ->step('any')
-                        ->suffix(__('mutable-content::units.kg_per_m3'));
+                        ->suffix(__('mutable-content::units.kg_per_m3')), $field);
                     break;
 
                 case DomainFieldType::TYPE_SURFACE_DENSITY:
-                    $component = TextInput::make($field->code)
+                    $component = static::withSignRules(TextInput::make($field->code)
                         ->numeric()
-                        ->rule(TypeSettings::allowsZero($field) ? 'min:0' : 'gt:0')
                         ->step('any')
-                        ->suffix(__('mutable-content::units.kg_per_m2'));
+                        ->suffix(__('mutable-content::units.kg_per_m2')), $field);
                     break;
+
+                case DomainFieldType::TYPE_MONEY:
+                    $component = static::moneyFormComponent($field, $usage->isRequired);
+
+                    if ($usage->isImmutableForSystemObjects) {
+                        $component->disabled(fn ($record) => $record && $record->isSystem());
+                    }
+
+                    $components[$field->code] = $component;
+
+                    continue 2;
 
                 default:
                     $component = TextInput::make($field->code);
@@ -292,6 +308,10 @@ class Resource extends BaseResource
 
                 case DomainFieldType::TYPE_DATETIME:
                     $component = TextEntry::make($field->code)->state(fn ($record) => $record instanceof ModelWithFields ? $record->getDateTime($field->code)?->format(static::DATETIME_DISPLAY_FORMAT) : null);
+                    break;
+
+                case DomainFieldType::TYPE_MONEY:
+                    $component = TextEntry::make($field->code)->state(static::moneyState($field));
                     break;
 
                 case DomainFieldType::TYPE_ICON:
@@ -414,6 +434,10 @@ class Resource extends BaseResource
                     $column = TextColumn::make($field->code)->state(fn ($record) => $record instanceof ModelWithFields ? $record->getDateTime($field->code)?->format(static::DATETIME_DISPLAY_FORMAT) : null);
                     break;
 
+                case DomainFieldType::TYPE_MONEY:
+                    $column = TextColumn::make($field->code)->state(static::moneyState($field))->alignEnd();
+                    break;
+
                 case DomainFieldType::TYPE_ICON:
                     $column = IconColumn::make($field->code)
                         ->icon(fn ($state) => IconHelper::getIcon($state))
@@ -480,6 +504,67 @@ class Resource extends BaseResource
             ->filters($filters);
     }
 
+    /**
+     * Rules of the allow_negative and allow_zero type settings; a field without negative values gets the minimum.
+     */
+    protected static function withSignRules(TextInput $component, Field $field): TextInput
+    {
+        if (!TypeSettings::allowsNegative($field)) {
+            $component->minValue(0);
+        }
+
+        return $component->rules(RuleHelper::getSignRules($field));
+    }
+
+    /**
+     * Amount and currency in the field state path; a fixed currency is the amount suffix.
+     * An empty amount makes the field empty (ModelWithFields::toMoneyValue()).
+     */
+    protected static function moneyFormComponent(Field $field, bool $isRequired): Fieldset
+    {
+        $currency = TypeSettings::currency($field);
+        $lovRegistry = app(LovRegistry::class);
+
+        $amount = TextInput::make(Money::KEY_AMOUNT)
+            ->label(__('mutable-content-filament::ui.money.amount'))
+            ->numeric()
+            ->step('any')
+            ->required($isRequired)
+            ->rule(fn (Get $get) => function (string $attribute, mixed $value, Closure $fail) use ($get, $field) {
+                if (blank($value)) {
+                    return;
+                }
+
+                new MoneyRule(TypeSettings::currency($field), TypeSettings::allowsNegative($field), TypeSettings::allowsZero($field))
+                    ->validate($attribute, [Money::KEY_AMOUNT => $value, Money::KEY_CURRENCY => $get(Money::KEY_CURRENCY)], $fail);
+            });
+
+        if ($currency !== null) {
+            $amount->suffix(Currency::symbolOf($currency));
+
+            $currencyComponent = Hidden::make(Money::KEY_CURRENCY)->default($currency);
+        } else {
+            $codes = array_map('strval', array_keys($lovRegistry->getLovItemsOptions(Currency::CODE)));
+
+            $currencyComponent = Select::make(Money::KEY_CURRENCY)
+                ->label(__('Currency'))
+                ->options(fn () => $lovRegistry->getLovItemsOptions(Currency::CODE))
+                ->default(count($codes) === 1 ? $codes[0] : null)
+                ->requiredWith(Money::KEY_AMOUNT);
+        }
+
+        return Fieldset::make($field->label)
+            ->statePath($field->code)
+            ->key($field->code)
+            ->columns(2)
+            ->schema([$amount, $currencyComponent]);
+    }
+
+    protected static function moneyState(Field $field): Closure
+    {
+        return fn ($record) => $record instanceof ModelWithFields ? $record->getMoney($field->code)?->format() : null;
+    }
+
     protected static function displayUnit(Field $field): string
     {
         return TypeSettings::getValue($field, TypeSettings::DISPLAY_UNIT) ?? TypeSettings::getUnitClass($field->fieldType)::baseUnit();
@@ -490,15 +575,10 @@ class Resource extends BaseResource
         $class = TypeSettings::getUnitClass($field->fieldType);
         $unit = static::displayUnit($field);
 
-        $component = TextInput::make($field->code)
+        $component = static::withSignRules(TextInput::make($field->code)
             ->numeric()
-            ->minValue(0)
             ->step('any')
-            ->suffix($class::unitLabel($unit));
-
-        if (in_array($field->fieldType, TypeSettings::ALLOW_ZERO_TYPES, true) && !TypeSettings::allowsZero($field)) {
-            $component->rule('gt:0');
-        }
+            ->suffix($class::unitLabel($unit)), $field);
 
         if ($unit === $class::baseUnit()) {
             return $component;

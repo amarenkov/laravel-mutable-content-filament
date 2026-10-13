@@ -13,6 +13,9 @@ use Filament\Schemas\Components\Utilities\Get;
 use Amarenkov\MutableContent\Domain\Field\Field;
 use Amarenkov\MutableContent\Domain\Field\Lov\Type as FieldType;
 use Amarenkov\MutableContent\Domain\Field\TypeSettings;
+use Amarenkov\MutableContent\Domain\LovRegistry;
+
+use Amarenkov\MutableContent\Models\Lov\Currency;
 
 use Amarenkov\MutableContent\Models\ModelWithFields;
 
@@ -25,6 +28,8 @@ class FieldTypeSettingsComponents
     public const DISPLAY_UNIT_STATE_PATH = Field::CODE_FIELD_TYPE_SETTINGS.'.'.TypeSettings::DISPLAY_UNIT;
     public const ALLOW_UNLISTED_CODES_STATE_PATH = Field::CODE_FIELD_TYPE_SETTINGS.'.'.TypeSettings::ALLOW_UNLISTED_CODES;
     public const ALLOW_ZERO_STATE_PATH = Field::CODE_FIELD_TYPE_SETTINGS.'.'.TypeSettings::ALLOW_ZERO;
+    public const ALLOW_NEGATIVE_STATE_PATH = Field::CODE_FIELD_TYPE_SETTINGS.'.'.TypeSettings::ALLOW_NEGATIVE;
+    public const CURRENCY_STATE_PATH = Field::CODE_FIELD_TYPE_SETTINGS.'.'.TypeSettings::CURRENCY;
     public const LINK_BY_CODE_STATE_PATH = Field::CODE_FIELD_TYPE_SETTINGS.'.'.TypeSettings::LINK_BY_CODE;
 
     protected const LINK_BY_CODE_LABEL = 'mutable-content-filament::ui.settings.link_by_code';
@@ -36,6 +41,9 @@ class FieldTypeSettingsComponents
 
     protected const ALLOW_ZERO_LABEL = 'mutable-content-filament::ui.settings.allow_zero';
     protected const ALLOW_ZERO_HELPER = 'mutable-content-filament::ui.settings.allow_zero_helper';
+
+    protected const ALLOW_NEGATIVE_LABEL = 'mutable-content-filament::ui.settings.allow_negative';
+    protected const ALLOW_NEGATIVE_HELPER = 'mutable-content-filament::ui.settings.allow_negative_helper';
 
     // static
     /**
@@ -49,19 +57,30 @@ class FieldTypeSettingsComponents
         return static::displayUnitComponents($fieldType, $inherited)
             + static::linkByCodeComponents($fieldType, $inherited)
             + static::allowUnlistedCodesComponents($fieldType, $inherited)
-            + static::allowZeroComponents($fieldType, $inherited);
+            + static::currencyComponents($fieldType, $inherited)
+            + static::signComponents($fieldType, $inherited);
     }
 
-    protected static function flagComponent(string $setting, string $statePath, string $label, string|Closure $helper, Closure $visible, ?Closure $inherited): FormField
+    protected static function hasSignSettings(?string $fieldType): bool
+    {
+        return in_array((string)$fieldType, TypeSettings::ALLOW_ZERO_TYPES, true) || in_array((string)$fieldType, TypeSettings::SIGNED_TYPES, true);
+    }
+
+    /**
+     * @param ?Closure $default value of the setting that is not set, evaluated by Filament; false if none
+     */
+    protected static function flagComponent(string $setting, string $statePath, string $label, string|Closure $helper, Closure $visible, ?Closure $inherited, ?Closure $default = null): FormField
     {
         $recordValue = fn (?ModelWithFields $record) => $record?->getField(Field::CODE_FIELD_TYPE_SETTINGS)[$setting] ?? null;
+
+        $default ??= fn () => false;
 
         if ($inherited) {
             return Select::make($statePath)
                 ->label($label)
                 ->helperText($helper)
                 ->options(['1' => __('mutable-content-filament::ui.yes'), '0' => __('mutable-content-filament::ui.no')])
-                ->placeholder(fn (Select $component) => __('mutable-content-filament::ui.settings.inherited', ['value' => ($component->evaluate($inherited)[$setting] ?? null) === true ? __('mutable-content-filament::ui.yes_lower') : __('mutable-content-filament::ui.no_lower')]))
+                ->placeholder(fn (Select $component) => __('mutable-content-filament::ui.settings.inherited', ['value' => ($component->evaluate($inherited)[$setting] ?? $component->evaluate($default)) === true ? __('mutable-content-filament::ui.yes_lower') : __('mutable-content-filament::ui.no_lower')]))
                 ->formatStateUsing(fn (?ModelWithFields $record) => match ($recordValue($record)) {
                     true => '1',
                     false => '0',
@@ -79,21 +98,61 @@ class FieldTypeSettingsComponents
             ->label($label)
             ->helperText($helper)
             ->inline(false)
-            ->formatStateUsing(fn (?ModelWithFields $record) => $recordValue($record) === true)
-            ->dehydrateStateUsing(fn ($state) => $state ? true : null)
+            ->formatStateUsing(fn (?ModelWithFields $record, FormField $component) => ($recordValue($record) ?? $component->evaluate($default)) === true)
+            ->dehydrateStateUsing(fn ($state, FormField $component) => (bool)$state === $component->evaluate($default) ? null : (bool)$state)
             ->visible($visible);
     }
 
-    protected static function allowZeroComponents(Closure $fieldType, ?Closure $inherited): array
+    /**
+     * Allow negative values and allow zero: number and measurement types, the default depends on the type.
+     */
+    protected static function signComponents(Closure $fieldType, ?Closure $inherited): array
     {
-        $component = static::flagComponent(
+        $visible = fn (FormField $component) => static::hasSignSettings($component->evaluate($fieldType));
+
+        $default = fn (string $setting) => fn (FormField $component) => TypeSettings::getDefaultValue((string)$component->evaluate($fieldType), $setting) === true;
+
+        $negative = static::flagComponent(
+            TypeSettings::ALLOW_NEGATIVE,
+            self::ALLOW_NEGATIVE_STATE_PATH,
+            __(self::ALLOW_NEGATIVE_LABEL),
+            __(self::ALLOW_NEGATIVE_HELPER),
+            $visible,
+            $inherited,
+            $default(TypeSettings::ALLOW_NEGATIVE),
+        );
+
+        $zero = static::flagComponent(
             TypeSettings::ALLOW_ZERO,
             self::ALLOW_ZERO_STATE_PATH,
             __(self::ALLOW_ZERO_LABEL),
             __(self::ALLOW_ZERO_HELPER),
-            fn (FormField $component) => in_array((string)$component->evaluate($fieldType), TypeSettings::ALLOW_ZERO_TYPES, true),
+            $visible,
             $inherited,
+            $default(TypeSettings::ALLOW_ZERO),
         );
+
+        return [$negative->getName() => $negative, $zero->getName() => $zero];
+    }
+
+    /**
+     * The only currency of a money field.
+     */
+    protected static function currencyComponents(Closure $fieldType, ?Closure $inherited): array
+    {
+        $component = Select::make(self::CURRENCY_STATE_PATH)
+            ->label(__('mutable-content-filament::ui.settings.currency'))
+            ->helperText(__('mutable-content-filament::ui.settings.currency_helper'))
+            ->options(fn () => app(LovRegistry::class)->getLovItemsOptions(Currency::CODE))
+            ->placeholder(function (Select $component) use ($inherited) {
+                $currency = $inherited ? ($component->evaluate($inherited)[TypeSettings::CURRENCY] ?? null) : null;
+
+                return $currency === null
+                    ? __('mutable-content-filament::ui.settings.any_currency')
+                    : __('mutable-content-filament::ui.settings.inherited', ['value' => app(LovRegistry::class)->getLovItemLabel(Currency::CODE, $currency) ?? $currency]);
+            })
+            ->formatStateUsing(fn (?ModelWithFields $record) => $record?->getField(Field::CODE_FIELD_TYPE_SETTINGS)[TypeSettings::CURRENCY] ?? null)
+            ->visible(fn (FormField $component) => (string)$component->evaluate($fieldType) === FieldType::TYPE_MONEY);
 
         return [$component->getName() => $component];
     }
@@ -227,7 +286,21 @@ class FieldTypeSettingsComponents
             }
         }
 
-        if (in_array($fieldType, TypeSettings::ALLOW_ZERO_TYPES, true)) {
+        $currency = is_array($settings) || $settings instanceof ArrayAccess ? ($settings[TypeSettings::CURRENCY] ?? null) : null;
+
+        if ($fieldType === FieldType::TYPE_MONEY && is_string($currency)) {
+            $result[] = __('mutable-content-filament::ui.settings.describe.currency', ['currency' => $currency]);
+        }
+
+        if (static::hasSignSettings($fieldType)) {
+            $allowNegative = is_array($settings) || $settings instanceof ArrayAccess ? ($settings[TypeSettings::ALLOW_NEGATIVE] ?? null) : null;
+
+            if ($allowNegative === true) {
+                $result[] = __('mutable-content-filament::ui.settings.describe.allow_negative');
+            } elseif ($allowNegative === false) {
+                $result[] = __('mutable-content-filament::ui.settings.describe.no_negative');
+            }
+
             $allowZero = is_array($settings) || $settings instanceof ArrayAccess ? ($settings[TypeSettings::ALLOW_ZERO] ?? null) : null;
 
             if ($allowZero === true) {
