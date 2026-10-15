@@ -7,6 +7,8 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-10-15
+
 ### Added
 
 - "Digits after the point" setting of money fields in the field and usage forms (the `decimals` type setting of the core); money tables, infolists and validation use it.
@@ -112,7 +114,8 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial release.
 
-[Unreleased]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.8.1...HEAD
+[0.8.1]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.7.2...v0.8.0
 [0.7.2]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.7.1...v0.7.2
 [0.7.1]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.7.0...v0.7.1
