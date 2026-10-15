@@ -18,6 +18,7 @@ use Filament\Tables\Columns\TextColumn;
 
 use Amarenkov\MutableContent\Domain\Field\Field;
 use Amarenkov\MutableContent\Domain\Field\Lov\Type as FieldType;
+use Amarenkov\MutableContent\Domain\Field\TypeSettings;
 use Amarenkov\MutableContent\Domain\LovRegistry;
 use Amarenkov\MutableContent\Domain\MutableClassRegistry;
 
@@ -70,6 +71,8 @@ class FieldResource extends Resource
             ->live()
             ->afterStateUpdated(function (Set $set, ?string $state) {
                 $set(FieldTypeSettingsComponents::DISPLAY_UNIT_STATE_PATH, FieldTypeSettingsComponents::defaultDisplayUnit($state));
+                $set(FieldTypeSettingsComponents::ALLOW_NEGATIVE_STATE_PATH, TypeSettings::getDefaultValue((string)$state, TypeSettings::ALLOW_NEGATIVE) === true);
+                $set(FieldTypeSettingsComponents::ALLOW_ZERO_STATE_PATH, TypeSettings::getDefaultValue((string)$state, TypeSettings::ALLOW_ZERO) === true);
             });
 
         $fieldTypeOptions = $fieldTypeComponent->getOptions();

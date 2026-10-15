@@ -15,6 +15,7 @@ use Amarenkov\MutableContent\Models\Lov\Item;
 use Amarenkov\MutableContent\Models\Lov\Lov;
 
 use Amarenkov\MutableContentFilament\Filament\Resources\Fields\FieldTypeSettingsComponents;
+use Amarenkov\MutableContentFilament\Filament\Resources\Fields\Pages\ManageFields;
 use Amarenkov\MutableContentFilament\Filament\Resources\Lovs\Resources\Items\Pages\ManageItems;
 
 use Amarenkov\MutableContentFilament\Tests\TestCase;
@@ -97,6 +98,53 @@ class MoneyTest extends TestCase
         $this->assertSame(['amount' => 3, 'currency' => 'BYN'], Item::where('lov_id', $lov->id)->first()->price);
     }
 
+    public function test_decimals_setting_is_validated_and_shown(): void
+    {
+        $lov = $this->makeLov(Type::TYPE_MONEY, 'price', [TypeSettings::DECIMALS => 6]);
+
+        Livewire::test(ManageItems::class, ['parentRecord' => $lov])
+            ->callAction('create', ['code' => 'tea', 'label' => 'Tea', 'price' => ['amount' => '0.0045201', 'currency' => 'USD']])
+            ->assertHasActionErrors(['price.amount']);
+
+        Livewire::test(ManageItems::class, ['parentRecord' => $lov])
+            ->callAction('create', ['code' => 'tea', 'label' => 'Tea', 'price' => ['amount' => '0.00452', 'currency' => 'USD']])
+            ->assertHasNoActionErrors();
+
+        $item = Item::where('lov_id', $lov->id)->first();
+
+        $this->assertSame(['amount' => 0.00452, 'currency' => 'USD'], $item->price);
+
+        Livewire::test(ManageItems::class, ['parentRecord' => $lov])
+            ->assertTableColumnStateSet('price', "0.004520\u{00A0}$", $item);
+    }
+
+    public function test_decimals_setting_is_saved_from_the_field_form(): void
+    {
+        Livewire::test(ManageFields::class)
+            ->mountAction('create')
+            ->fillForm(['code' => 'unit_price', 'label' => 'Unit price', 'field_type' => Type::TYPE_MONEY])
+            ->set('mountedActions.0.data.'.FieldTypeSettingsComponents::DECIMALS_STATE_PATH, '6')
+            ->callMountedAction()
+            ->assertHasNoActionErrors();
+
+        $this->assertSame([TypeSettings::DECIMALS => 6], Field::where('code', 'unit_price')->first()->field_type_settings);
+    }
+
+    public function test_new_number_field_keeps_the_sign_defaults_of_its_type(): void
+    {
+        Livewire::test(ManageFields::class)
+            ->callAction('create', ['code' => 'total', 'label' => 'Total', 'field_type' => Type::TYPE_MONEY])
+            ->assertHasNoActionErrors();
+
+        $this->assertNull(Field::where('code', 'total')->first()->field_type_settings);
+
+        Livewire::test(ManageFields::class)
+            ->callAction('create', ['code' => 'net_weight', 'label' => 'Net weight', 'field_type' => Type::TYPE_WEIGHT])
+            ->assertHasNoActionErrors();
+
+        $this->assertNull(Field::where('code', 'net_weight')->first()->field_type_settings);
+    }
+
     public function test_measurements_take_negative_values_when_allowed(): void
     {
         $lov = $this->makeLov(Type::TYPE_WEIGHT, 'net_weight');
@@ -119,5 +167,6 @@ class MoneyTest extends TestCase
     public function test_settings_are_described(): void
     {
         $this->assertSame(['currency USD', 'allow negative', 'no 0'], FieldTypeSettingsComponents::describe(Type::TYPE_MONEY, [TypeSettings::CURRENCY => 'USD', TypeSettings::ALLOW_NEGATIVE => true, TypeSettings::ALLOW_ZERO => false]));
+        $this->assertSame(['6 digits after the point'], FieldTypeSettingsComponents::describe(Type::TYPE_MONEY, [TypeSettings::DECIMALS => 6]));
     }
 }

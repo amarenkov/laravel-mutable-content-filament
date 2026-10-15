@@ -535,7 +535,7 @@ class Resource extends BaseResource
                     return;
                 }
 
-                new MoneyRule(TypeSettings::currency($field), TypeSettings::allowsNegative($field), TypeSettings::allowsZero($field))
+                MoneyRule::forField($field)
                     ->validate($attribute, [Money::KEY_AMOUNT => $value, Money::KEY_CURRENCY => $get(Money::KEY_CURRENCY)], $fail);
             });
 
@@ -562,7 +562,7 @@ class Resource extends BaseResource
 
     protected static function moneyState(Field $field): Closure
     {
-        return fn ($record) => $record instanceof ModelWithFields ? $record->getMoney($field->code)?->format() : null;
+        return fn ($record) => $record instanceof ModelWithFields ? $record->getMoney($field->code)?->format(TypeSettings::decimals($field)) : null;
     }
 
     protected static function displayUnit(Field $field): string

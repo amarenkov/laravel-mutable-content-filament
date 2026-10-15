@@ -19,6 +19,8 @@ use Amarenkov\MutableContent\Models\Lov\Currency;
 
 use Amarenkov\MutableContent\Models\ModelWithFields;
 
+use Amarenkov\MutableContent\ValueObjects\Money;
+
 /**
  * Field type settings components for the field and usage forms.
  */
@@ -30,6 +32,7 @@ class FieldTypeSettingsComponents
     public const ALLOW_ZERO_STATE_PATH = Field::CODE_FIELD_TYPE_SETTINGS.'.'.TypeSettings::ALLOW_ZERO;
     public const ALLOW_NEGATIVE_STATE_PATH = Field::CODE_FIELD_TYPE_SETTINGS.'.'.TypeSettings::ALLOW_NEGATIVE;
     public const CURRENCY_STATE_PATH = Field::CODE_FIELD_TYPE_SETTINGS.'.'.TypeSettings::CURRENCY;
+    public const DECIMALS_STATE_PATH = Field::CODE_FIELD_TYPE_SETTINGS.'.'.TypeSettings::DECIMALS;
     public const LINK_BY_CODE_STATE_PATH = Field::CODE_FIELD_TYPE_SETTINGS.'.'.TypeSettings::LINK_BY_CODE;
 
     protected const LINK_BY_CODE_LABEL = 'mutable-content-filament::ui.settings.link_by_code';
@@ -58,6 +61,7 @@ class FieldTypeSettingsComponents
             + static::linkByCodeComponents($fieldType, $inherited)
             + static::allowUnlistedCodesComponents($fieldType, $inherited)
             + static::currencyComponents($fieldType, $inherited)
+            + static::decimalsComponents($fieldType, $inherited)
             + static::signComponents($fieldType, $inherited);
     }
 
@@ -152,6 +156,33 @@ class FieldTypeSettingsComponents
                     : __('mutable-content-filament::ui.settings.inherited', ['value' => app(LovRegistry::class)->getLovItemLabel(Currency::CODE, $currency) ?? $currency]);
             })
             ->formatStateUsing(fn (?ModelWithFields $record) => $record?->getField(Field::CODE_FIELD_TYPE_SETTINGS)[TypeSettings::CURRENCY] ?? null)
+            ->visible(fn (FormField $component) => (string)$component->evaluate($fieldType) === FieldType::TYPE_MONEY);
+
+        return [$component->getName() => $component];
+    }
+
+    /**
+     * Digits after the point of a money field instead of the currency ones.
+     */
+    protected static function decimalsComponents(Closure $fieldType, ?Closure $inherited): array
+    {
+        $component = Select::make(self::DECIMALS_STATE_PATH)
+            ->label(__('mutable-content-filament::ui.settings.decimals'))
+            ->helperText(__('mutable-content-filament::ui.settings.decimals_helper'))
+            ->options(array_combine(array_map('strval', range(0, Money::MAX_DECIMALS)), array_map('strval', range(0, Money::MAX_DECIMALS))))
+            ->placeholder(function (Select $component) use ($inherited) {
+                $decimals = $inherited ? ($component->evaluate($inherited)[TypeSettings::DECIMALS] ?? null) : null;
+
+                return is_int($decimals)
+                    ? __('mutable-content-filament::ui.settings.inherited', ['value' => $decimals])
+                    : __('mutable-content-filament::ui.settings.currency_decimals');
+            })
+            ->formatStateUsing(function (?ModelWithFields $record) {
+                $decimals = $record?->getField(Field::CODE_FIELD_TYPE_SETTINGS)[TypeSettings::DECIMALS] ?? null;
+
+                return is_int($decimals) ? (string)$decimals : null;
+            })
+            ->dehydrateStateUsing(fn ($state) => $state === null || $state === '' ? null : (int)$state)
             ->visible(fn (FormField $component) => (string)$component->evaluate($fieldType) === FieldType::TYPE_MONEY);
 
         return [$component->getName() => $component];
@@ -290,6 +321,12 @@ class FieldTypeSettingsComponents
 
         if ($fieldType === FieldType::TYPE_MONEY && is_string($currency)) {
             $result[] = __('mutable-content-filament::ui.settings.describe.currency', ['currency' => $currency]);
+        }
+
+        $decimals = is_array($settings) || $settings instanceof ArrayAccess ? ($settings[TypeSettings::DECIMALS] ?? null) : null;
+
+        if ($fieldType === FieldType::TYPE_MONEY && is_int($decimals)) {
+            $result[] = __('mutable-content-filament::ui.settings.describe.decimals', ['decimals' => $decimals]);
         }
 
         if (static::hasSignSettings($fieldType)) {
