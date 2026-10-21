@@ -7,10 +7,14 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.2] - 2026-10-21
+
 ### Added
 
 - `duration` fields: entered and shown in the display unit of the field (seconds, minutes or hours).
 - "Format" setting of text fields in the field and usage forms (plain text or Markdown). Markdown fields are edited with the Markdown editor, shown rendered in infolists and as plain text in tables.
+
+Requires `amarenkov/laravel-mutable-content` ^0.7.11.
 
 ## [0.8.1] - 2026-10-15
 
@@ -119,7 +123,8 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial release.
 
-[Unreleased]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.8.1...HEAD
+[Unreleased]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.8.2...HEAD
+[0.8.2]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.8.1...v0.8.2
 [0.8.1]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.7.2...v0.8.0
 [0.7.2]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.7.1...v0.7.2
