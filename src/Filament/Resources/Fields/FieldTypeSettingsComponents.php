@@ -34,6 +34,7 @@ class FieldTypeSettingsComponents
     public const CURRENCY_STATE_PATH = Field::CODE_FIELD_TYPE_SETTINGS.'.'.TypeSettings::CURRENCY;
     public const DECIMALS_STATE_PATH = Field::CODE_FIELD_TYPE_SETTINGS.'.'.TypeSettings::DECIMALS;
     public const LINK_BY_CODE_STATE_PATH = Field::CODE_FIELD_TYPE_SETTINGS.'.'.TypeSettings::LINK_BY_CODE;
+    public const FORMAT_STATE_PATH = Field::CODE_FIELD_TYPE_SETTINGS.'.'.TypeSettings::FORMAT;
 
     protected const LINK_BY_CODE_LABEL = 'mutable-content-filament::ui.settings.link_by_code';
     protected const LINK_BY_CODE_HELPER = 'mutable-content-filament::ui.settings.link_by_code_helper';
@@ -62,6 +63,7 @@ class FieldTypeSettingsComponents
             + static::allowUnlistedCodesComponents($fieldType, $inherited)
             + static::currencyComponents($fieldType, $inherited)
             + static::decimalsComponents($fieldType, $inherited)
+            + static::formatComponents($fieldType, $inherited)
             + static::signComponents($fieldType, $inherited);
     }
 
@@ -184,6 +186,32 @@ class FieldTypeSettingsComponents
             })
             ->dehydrateStateUsing(fn ($state) => $state === null || $state === '' ? null : (int)$state)
             ->visible(fn (FormField $component) => (string)$component->evaluate($fieldType) === FieldType::TYPE_MONEY);
+
+        return [$component->getName() => $component];
+    }
+
+    /**
+     * Markup of a text field.
+     *
+     * @return array<string, FormField>
+     */
+    protected static function formatComponents(Closure $fieldType, ?Closure $inherited): array
+    {
+        $formatLabel = fn (string $format) => __('mutable-content-filament::ui.settings.formats.'.$format);
+
+        $component = Select::make(self::FORMAT_STATE_PATH)
+            ->label(__('mutable-content-filament::ui.settings.format'))
+            ->helperText(__('mutable-content-filament::ui.settings.format_helper'))
+            ->options(array_combine(TypeSettings::FORMATS, array_map($formatLabel, TypeSettings::FORMATS)))
+            ->placeholder(function (Select $component) use ($inherited, $formatLabel) {
+                $format = $inherited ? ($component->evaluate($inherited)[TypeSettings::FORMAT] ?? null) : null;
+
+                return in_array($format, TypeSettings::FORMATS, true)
+                    ? __('mutable-content-filament::ui.settings.inherited', ['value' => $formatLabel($format)])
+                    : __('mutable-content-filament::ui.settings.default', ['value' => $formatLabel(TypeSettings::FORMAT_PLAIN)]);
+            })
+            ->formatStateUsing(fn (?ModelWithFields $record) => $record?->getField(Field::CODE_FIELD_TYPE_SETTINGS)[TypeSettings::FORMAT] ?? null)
+            ->visible(fn (FormField $component) => (string)$component->evaluate($fieldType) === FieldType::TYPE_TEXT);
 
         return [$component->getName() => $component];
     }
@@ -321,6 +349,12 @@ class FieldTypeSettingsComponents
 
         if ($fieldType === FieldType::TYPE_MONEY && is_string($currency)) {
             $result[] = __('mutable-content-filament::ui.settings.describe.currency', ['currency' => $currency]);
+        }
+
+        $format = is_array($settings) || $settings instanceof ArrayAccess ? ($settings[TypeSettings::FORMAT] ?? null) : null;
+
+        if ($fieldType === FieldType::TYPE_TEXT && $format === TypeSettings::FORMAT_MARKDOWN) {
+            $result[] = __('mutable-content-filament::ui.settings.describe.markdown');
         }
 
         $decimals = is_array($settings) || $settings instanceof ArrayAccess ? ($settings[TypeSettings::DECIMALS] ?? null) : null;

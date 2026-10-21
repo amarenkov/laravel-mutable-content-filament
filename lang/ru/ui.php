@@ -73,7 +73,15 @@ return [
         'decimals_helper' => 'Сколько знаков хранит сумма вместо знаков валюты, например у цен за штуку.',
         'currency_decimals' => 'Как у валюты',
 
+        'format' => 'Формат',
+        'format_helper' => 'Текст в Markdown редактируется редактором Markdown и показывается с заголовками, списками и ссылками.',
+        'formats' => [
+            'plain' => 'Обычный текст',
+            'markdown' => 'Markdown',
+        ],
+        'default' => 'По умолчанию: :value',
         'describe' => [
+            'markdown' => 'Markdown',
             'display_unit' => 'отображать в :unit',
             'link_by_code' => 'связь по коду',
             'link_by_id' => 'связь по id',

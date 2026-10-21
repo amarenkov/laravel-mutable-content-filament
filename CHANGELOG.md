@@ -7,6 +7,11 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `duration` fields: entered and shown in the display unit of the field (seconds, minutes or hours).
+- "Format" setting of text fields in the field and usage forms (plain text or Markdown). Markdown fields are edited with the Markdown editor, shown rendered in infolists and as plain text in tables.
+
 ## [0.8.1] - 2026-10-15
 
 ### Added

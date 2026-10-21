@@ -21,6 +21,7 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
@@ -145,10 +146,12 @@ class Resource extends BaseResource
                     break;
 
                 case DomainFieldType::TYPE_TEXT:
-                    $component = Textarea::make($field->code)
-                        ->rows(3)
-                        ->autosize()
-                        ->columnSpanFull();
+                    $component = TypeSettings::isMarkdown($field)
+                        ? MarkdownEditor::make($field->code)->columnSpanFull()
+                        : Textarea::make($field->code)
+                            ->rows(3)
+                            ->autosize()
+                            ->columnSpanFull();
                     break;
 
                 case DomainFieldType::TYPE_FLOAT:
@@ -177,6 +180,7 @@ class Resource extends BaseResource
                 case DomainFieldType::TYPE_LENGTH:
                 case DomainFieldType::TYPE_AREA:
                 case DomainFieldType::TYPE_VOLUME:
+                case DomainFieldType::TYPE_DURATION:
                     $component = static::unitFormComponent($field);
                     break;
 
@@ -273,10 +277,14 @@ class Resource extends BaseResource
 
             switch ($field->fieldType) {
                 case DomainFieldType::TYPE_TEXT:
-                    $component = TextEntry::make($field->code)
-                        ->formatStateUsing(fn ($state) => nl2br(e($state)))
-                        ->html()
-                        ->columnSpanFull();
+                    $component = TypeSettings::isMarkdown($field)
+                        ? TextEntry::make($field->code)
+                            ->markdown()
+                            ->columnSpanFull()
+                        : TextEntry::make($field->code)
+                            ->formatStateUsing(fn ($state) => nl2br(e($state)))
+                            ->html()
+                            ->columnSpanFull();
                     break;
 
                 case DomainFieldType::TYPE_LOV_ITEM:
@@ -299,6 +307,7 @@ class Resource extends BaseResource
                 case DomainFieldType::TYPE_LENGTH:
                 case DomainFieldType::TYPE_AREA:
                 case DomainFieldType::TYPE_VOLUME:
+                case DomainFieldType::TYPE_DURATION:
                     $component = TextEntry::make($field->code)->formatStateUsing(static::unitFormatter($field));
                     break;
 
@@ -397,6 +406,7 @@ class Resource extends BaseResource
 
                 case DomainFieldType::TYPE_TEXT:
                     $column = TextColumn::make($field->code)
+                        ->formatStateUsing(fn ($state) => TypeSettings::isMarkdown($field) && is_string($state) ? Str::of(Str::markdown($state, ['html_input' => 'escape']))->stripTags()->squish()->toString() : $state)
                         ->limit(50)
                         ->tooltip(function (TextColumn $column) {
                             $state = $column->getState();
@@ -423,6 +433,7 @@ class Resource extends BaseResource
                 case DomainFieldType::TYPE_LENGTH:
                 case DomainFieldType::TYPE_AREA:
                 case DomainFieldType::TYPE_VOLUME:
+                case DomainFieldType::TYPE_DURATION:
                     $column = TextColumn::make($field->code)->formatStateUsing(static::unitFormatter($field));
                     break;
 

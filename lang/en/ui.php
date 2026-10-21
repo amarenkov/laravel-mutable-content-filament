@@ -73,7 +73,15 @@ return [
         'decimals_helper' => 'Digits the amount keeps instead of those of the currency, e.g. for unit prices.',
         'currency_decimals' => 'As in the currency',
 
+        'format' => 'Format',
+        'format_helper' => 'Markdown text is edited with a Markdown editor and shown with headings, lists and links.',
+        'formats' => [
+            'plain' => 'Plain text',
+            'markdown' => 'Markdown',
+        ],
+        'default' => 'Default: :value',
         'describe' => [
+            'markdown' => 'Markdown',
             'display_unit' => 'display in :unit',
             'link_by_code' => 'link by code',
             'link_by_id' => 'link by id',
