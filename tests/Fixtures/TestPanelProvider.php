@@ -10,6 +10,7 @@ use Amarenkov\MutableContentFilament\Filament\Resources\Fields\Resources\Usage\U
 use Amarenkov\MutableContentFilament\Filament\Resources\Lovs\LovResource;
 use Amarenkov\MutableContentFilament\Filament\Resources\Lovs\Resources\Items\ItemResource;
 
+use Amarenkov\MutableContentFilament\Tests\Fixtures\Resources\Notes\NoteResource;
 use Amarenkov\MutableContentFilament\Tests\Fixtures\Resources\Records\RecordResource;
 
 class TestPanelProvider extends PanelProvider
@@ -26,6 +27,7 @@ class TestPanelProvider extends PanelProvider
                 LovResource::class,
                 ItemResource::class,
                 RecordResource::class,
+                NoteResource::class,
             ]);
     }
 }

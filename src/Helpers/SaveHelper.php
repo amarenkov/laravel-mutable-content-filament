@@ -5,6 +5,7 @@ namespace Amarenkov\MutableContentFilament\Helpers;
 use Closure;
 use DomainException;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\UniqueConstraintViolationException;
 
@@ -36,6 +37,16 @@ class SaveHelper
                 ->send();
 
             throw (new Halt())->rollBackDatabaseTransaction();
+        }
+    }
+
+    /**
+     * Set the change log author and comment, for a model that has a change log.
+     */
+    public static function prepareLog(Model $record, string $comment): void
+    {
+        if (method_exists($record, 'withLogContext')) {
+            $record->withLogContext($comment)->user(auth()->id());
         }
     }
 }

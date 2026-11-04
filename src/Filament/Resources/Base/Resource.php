@@ -37,6 +37,7 @@ use Filament\Support\Icons\Heroicon;
 
 use function Filament\Support\generate_icon_html;
 
+use Amarenkov\MutableContent\Contracts\MutableModel;
 use Amarenkov\MutableContent\Domain\Field\Field;
 use Amarenkov\MutableContent\Domain\Field\Lov\Type as DomainFieldType;
 use Amarenkov\MutableContent\Domain\Field\TypeSettings;
@@ -102,7 +103,7 @@ class Resource extends BaseResource
     {
         $model = static::getModel();
 
-        if (!is_subclass_of($model, ModelWithFields::class)) {
+        if (!is_subclass_of($model, MutableModel::class)) {
             return null;
         }
 
@@ -114,7 +115,7 @@ class Resource extends BaseResource
     }
 
     /**
-     * Field usage scopes of the page (see ModelWithFields::getFieldScopes()); null for the class ones.
+     * Field usage scopes of the page (see MutableModel::getFieldScopes()); null for the class ones.
      *
      * @return ?array<string>
      */
@@ -202,7 +203,7 @@ class Resource extends BaseResource
                         ->timezone(ModelWithFields::displayTimezone())
                         ->displayFormat(static::DATETIME_DISPLAY_FORMAT)
                         ->format('Y-m-d H:i:s')
-                        ->formatStateUsing(fn ($record) => $record instanceof ModelWithFields ? $record->getDateTime($field->code)?->setTimezone(config('app.timezone'))->format('Y-m-d H:i:s') : null)
+                        ->formatStateUsing(fn ($record) => $record instanceof MutableModel ? $record->getDateTime($field->code)?->setTimezone(config('app.timezone'))->format('Y-m-d H:i:s') : null)
                         ->dehydrateStateUsing(fn ($state) => filled($state) ? Carbon::parse($state, config('app.timezone'))->utc()->format(ModelWithFields::DATETIME_FORMAT) : null);
                     break;
 
@@ -316,7 +317,7 @@ class Resource extends BaseResource
                     break;
 
                 case DomainFieldType::TYPE_DATETIME:
-                    $component = TextEntry::make($field->code)->state(fn ($record) => $record instanceof ModelWithFields ? $record->getDateTime($field->code)?->format(static::DATETIME_DISPLAY_FORMAT) : null);
+                    $component = TextEntry::make($field->code)->state(fn ($record) => $record instanceof MutableModel ? $record->getDateTime($field->code)?->format(static::DATETIME_DISPLAY_FORMAT) : null);
                     break;
 
                 case DomainFieldType::TYPE_MONEY:
@@ -442,7 +443,7 @@ class Resource extends BaseResource
                     break;
 
                 case DomainFieldType::TYPE_DATETIME:
-                    $column = TextColumn::make($field->code)->state(fn ($record) => $record instanceof ModelWithFields ? $record->getDateTime($field->code)?->format(static::DATETIME_DISPLAY_FORMAT) : null);
+                    $column = TextColumn::make($field->code)->state(fn ($record) => $record instanceof MutableModel ? $record->getDateTime($field->code)?->format(static::DATETIME_DISPLAY_FORMAT) : null);
                     break;
 
                 case DomainFieldType::TYPE_MONEY:
@@ -529,7 +530,7 @@ class Resource extends BaseResource
 
     /**
      * Amount and currency in the field state path; a fixed currency is the amount suffix.
-     * An empty amount makes the field empty (ModelWithFields::toMoneyValue()).
+     * An empty amount makes the field empty (MutableModel::toMoneyValue()).
      */
     protected static function moneyFormComponent(Field $field, bool $isRequired): Fieldset
     {
@@ -573,7 +574,7 @@ class Resource extends BaseResource
 
     protected static function moneyState(Field $field): Closure
     {
-        return fn ($record) => $record instanceof ModelWithFields ? $record->getMoney($field->code)?->format(TypeSettings::decimals($field)) : null;
+        return fn ($record) => $record instanceof MutableModel ? $record->getMoney($field->code)?->format(TypeSettings::decimals($field)) : null;
     }
 
     protected static function displayUnit(Field $field): string

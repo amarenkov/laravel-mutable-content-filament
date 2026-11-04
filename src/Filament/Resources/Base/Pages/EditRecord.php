@@ -23,7 +23,7 @@ class EditRecord extends BaseEditRecord
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         $record->fill($data);
-        $record->withLogContext(RequestHelper::getPath())->user(auth()->id());
+        SaveHelper::prepareLog($record, RequestHelper::getPath());
 
         SaveHelper::save(fn () => $record->save());
 

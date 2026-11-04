@@ -3,6 +3,7 @@
 namespace Amarenkov\MutableContentFilament\Filament\Resources\Fields\Pages;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 use Filament\Actions\Action;
@@ -13,11 +14,11 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Support\Enums\Size;
 
+use Amarenkov\MutableContent\Contracts\MutableModel;
 use Amarenkov\MutableContent\Domain\MutableClassRegistry;
 
 use Amarenkov\MutableContent\Models\Field\Field as FieldModel;
 use Amarenkov\MutableContent\Models\Field\Usage as FieldUsageModels;
-use Amarenkov\MutableContent\Models\ModelWithFields;
 
 use Amarenkov\MutableContentFilament\Filament\Resources\Base\Pages\ManageRecords;
 
@@ -43,7 +44,7 @@ class ManageFields extends ManageRecords
     }
 
     /**
-     * @param class-string<ModelWithFields> $mutableClass
+     * @param class-string<Model&MutableModel> $mutableClass
      */
     protected static function boundToType(Builder $query, string $mutableClass, string $typeCode): Builder
     {

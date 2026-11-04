@@ -25,5 +25,10 @@ return new class extends Migration
             $table->fieldExtract('code')->type('varchar(50)');
             $table->unique('code');
         });
+
+        Schema::create('notes', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->mutableFields();
+        });
     }
 };

@@ -10,6 +10,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Utilities\Get;
 
+use Amarenkov\MutableContent\Contracts\MutableModel;
 use Amarenkov\MutableContent\Domain\Field\Field;
 use Amarenkov\MutableContent\Domain\Field\Lov\Type as FieldType;
 use Amarenkov\MutableContent\Domain\Field\TypeSettings;
@@ -17,7 +18,6 @@ use Amarenkov\MutableContent\Domain\LovRegistry;
 
 use Amarenkov\MutableContent\Models\Lov\Currency;
 
-use Amarenkov\MutableContent\Models\ModelWithFields;
 
 use Amarenkov\MutableContent\ValueObjects\Money;
 
@@ -77,7 +77,7 @@ class FieldTypeSettingsComponents
      */
     protected static function flagComponent(string $setting, string $statePath, string $label, string|Closure $helper, Closure $visible, ?Closure $inherited, ?Closure $default = null): FormField
     {
-        $recordValue = fn (?ModelWithFields $record) => $record?->getField(Field::CODE_FIELD_TYPE_SETTINGS)[$setting] ?? null;
+        $recordValue = fn (?MutableModel $record) => $record?->getField(Field::CODE_FIELD_TYPE_SETTINGS)[$setting] ?? null;
 
         $default ??= fn () => false;
 
@@ -87,7 +87,7 @@ class FieldTypeSettingsComponents
                 ->helperText($helper)
                 ->options(['1' => __('mutable-content-filament::ui.yes'), '0' => __('mutable-content-filament::ui.no')])
                 ->placeholder(fn (Select $component) => __('mutable-content-filament::ui.settings.inherited', ['value' => ($component->evaluate($inherited)[$setting] ?? $component->evaluate($default)) === true ? __('mutable-content-filament::ui.yes_lower') : __('mutable-content-filament::ui.no_lower')]))
-                ->formatStateUsing(fn (?ModelWithFields $record) => match ($recordValue($record)) {
+                ->formatStateUsing(fn (?MutableModel $record) => match ($recordValue($record)) {
                     true => '1',
                     false => '0',
                     default => null,
@@ -104,7 +104,7 @@ class FieldTypeSettingsComponents
             ->label($label)
             ->helperText($helper)
             ->inline(false)
-            ->formatStateUsing(fn (?ModelWithFields $record, FormField $component) => ($recordValue($record) ?? $component->evaluate($default)) === true)
+            ->formatStateUsing(fn (?MutableModel $record, FormField $component) => ($recordValue($record) ?? $component->evaluate($default)) === true)
             ->dehydrateStateUsing(fn ($state, FormField $component) => (bool)$state === $component->evaluate($default) ? null : (bool)$state)
             ->visible($visible);
     }
@@ -157,7 +157,7 @@ class FieldTypeSettingsComponents
                     ? __('mutable-content-filament::ui.settings.any_currency')
                     : __('mutable-content-filament::ui.settings.inherited', ['value' => app(LovRegistry::class)->getLovItemLabel(Currency::CODE, $currency) ?? $currency]);
             })
-            ->formatStateUsing(fn (?ModelWithFields $record) => $record?->getField(Field::CODE_FIELD_TYPE_SETTINGS)[TypeSettings::CURRENCY] ?? null)
+            ->formatStateUsing(fn (?MutableModel $record) => $record?->getField(Field::CODE_FIELD_TYPE_SETTINGS)[TypeSettings::CURRENCY] ?? null)
             ->visible(fn (FormField $component) => (string)$component->evaluate($fieldType) === FieldType::TYPE_MONEY);
 
         return [$component->getName() => $component];
@@ -179,7 +179,7 @@ class FieldTypeSettingsComponents
                     ? __('mutable-content-filament::ui.settings.inherited', ['value' => $decimals])
                     : __('mutable-content-filament::ui.settings.currency_decimals');
             })
-            ->formatStateUsing(function (?ModelWithFields $record) {
+            ->formatStateUsing(function (?MutableModel $record) {
                 $decimals = $record?->getField(Field::CODE_FIELD_TYPE_SETTINGS)[TypeSettings::DECIMALS] ?? null;
 
                 return is_int($decimals) ? (string)$decimals : null;
@@ -210,7 +210,7 @@ class FieldTypeSettingsComponents
                     ? __('mutable-content-filament::ui.settings.inherited', ['value' => $formatLabel($format)])
                     : __('mutable-content-filament::ui.settings.default', ['value' => $formatLabel(TypeSettings::FORMAT_PLAIN)]);
             })
-            ->formatStateUsing(fn (?ModelWithFields $record) => $record?->getField(Field::CODE_FIELD_TYPE_SETTINGS)[TypeSettings::FORMAT] ?? null)
+            ->formatStateUsing(fn (?MutableModel $record) => $record?->getField(Field::CODE_FIELD_TYPE_SETTINGS)[TypeSettings::FORMAT] ?? null)
             ->visible(fn (FormField $component) => (string)$component->evaluate($fieldType) === FieldType::TYPE_TEXT);
 
         return [$component->getName() => $component];
@@ -292,12 +292,12 @@ class FieldTypeSettingsComponents
 
                     return __('mutable-content-filament::ui.settings.inherited', ['value' => $class::unitLabel(in_array($unit, $class::units(), true) ? $unit : $class::baseUnit())]);
                 })
-                ->formatStateUsing(fn (?ModelWithFields $record) => $record?->getField(Field::CODE_FIELD_TYPE_SETTINGS)[TypeSettings::DISPLAY_UNIT] ?? null)];
+                ->formatStateUsing(fn (?MutableModel $record) => $record?->getField(Field::CODE_FIELD_TYPE_SETTINGS)[TypeSettings::DISPLAY_UNIT] ?? null)];
         }
 
         return [$displayUnit->getName() => $displayUnit
             ->selectablePlaceholder(false)
-            ->formatStateUsing(function (Select $component, ?ModelWithFields $record) use ($unitClass) {
+            ->formatStateUsing(function (Select $component, ?MutableModel $record) use ($unitClass) {
                 $class = $unitClass($component);
 
                 return $record?->getField(Field::CODE_FIELD_TYPE_SETTINGS)[TypeSettings::DISPLAY_UNIT] ?? ($class ? $class::baseUnit() : null);

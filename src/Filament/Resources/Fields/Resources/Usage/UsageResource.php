@@ -14,10 +14,10 @@ use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Support\Icons\Heroicon;
 
+use Amarenkov\MutableContent\Contracts\MutableModel;
 use Amarenkov\MutableContent\Domain\Field\Field;
 use Amarenkov\MutableContent\Domain\MutableClassRegistry;
 use Amarenkov\MutableContent\Models\Field\Usage as FieldUsageModels;
-use Amarenkov\MutableContent\Models\ModelWithFields;
 
 use Amarenkov\MutableContent\Rules\FieldAllowedInClass;
 
@@ -133,7 +133,7 @@ class UsageResource extends Resource
      */
     protected static function typeOptionsOf(mixed $mutableClass): array
     {
-        return is_string($mutableClass) && is_subclass_of($mutableClass, ModelWithFields::class) ? $mutableClass::getTypeOptions() : [];
+        return is_string($mutableClass) && is_subclass_of($mutableClass, MutableModel::class) ? $mutableClass::getTypeOptions() : [];
     }
 
     protected static function tableFromFields(Table $table, ?array $scopes = null)

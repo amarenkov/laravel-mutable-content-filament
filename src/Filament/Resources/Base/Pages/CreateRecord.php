@@ -22,7 +22,7 @@ class CreateRecord extends BaseCreateRecord
             : new ($this->getModel())();
 
         $record->fill($data);
-        $record->withLogContext(RequestHelper::getPath())->user(auth()->id());
+        SaveHelper::prepareLog($record, RequestHelper::getPath());
 
         return SaveHelper::save(function () use ($record, $parentRecord) {
             if ($parentRecord) {
