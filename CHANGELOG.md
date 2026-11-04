@@ -7,6 +7,15 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.3] - 2026-11-04
+
+### Changed
+
+- Resources and field screens work with any model implementing `MutableModel`, so a model on the core traits gets them.
+- The change log author and comment are set only on a model that has the change log (`SaveHelper::prepareLog()`).
+
+Requires `amarenkov/laravel-mutable-content` ^0.8.
+
 ## [0.8.2] - 2026-10-21
 
 ### Added
@@ -123,7 +132,8 @@ Requires `amarenkov/laravel-mutable-content` ^0.7.11.
 
 Initial release.
 
-[Unreleased]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.8.2...HEAD
+[Unreleased]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.8.3...HEAD
+[0.8.3]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.8.2...v0.8.3
 [0.8.2]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.8.1...v0.8.2
 [0.8.1]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.7.2...v0.8.0
