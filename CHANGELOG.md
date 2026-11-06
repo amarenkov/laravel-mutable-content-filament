@@ -7,6 +7,10 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-11-06
+
+Requires `amarenkov/laravel-mutable-content` ^0.9.
+
 ### Added
 
 - The `secret` field type: a password input that never shows the value, the mask in tables and infolists, the settings of the visible characters.
@@ -136,7 +140,8 @@ Requires `amarenkov/laravel-mutable-content` ^0.7.11.
 
 Initial release.
 
-[Unreleased]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.8.3...HEAD
+[Unreleased]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.8.3...v0.9.0
 [0.8.3]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.8.2...v0.8.3
 [0.8.2]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.8.1...v0.8.2
 [0.8.1]: https://github.com/amarenkov/laravel-mutable-content-filament/compare/v0.8.0...v0.8.1
