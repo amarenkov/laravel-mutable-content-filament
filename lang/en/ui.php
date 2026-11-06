@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'secret_kept' => 'Leave empty to keep the current value',
     'navigation_group' => 'System settings',
     'fields' => 'Fields',
     'lovs' => 'LOVs',
@@ -72,6 +73,9 @@ return [
         'decimals' => 'Digits after the point',
         'decimals_helper' => 'Digits the amount keeps instead of those of the currency, e.g. for unit prices.',
         'currency_decimals' => 'As in the currency',
+        'visible_start' => 'Characters shown at the start',
+        'visible_end' => 'Characters shown at the end',
+        'visible_helper' => 'The rest is shown as asterisks; a short secret is hidden entirely.',
 
         'format' => 'Format',
         'format_helper' => 'Markdown text is edited with a Markdown editor and shown with headings, lists and links.',
@@ -89,6 +93,8 @@ return [
             'listed_codes_only' => 'listed codes only',
             'currency' => 'currency :currency',
             'decimals' => ':decimals digits after the point',
+            'visible_start' => ':count characters shown at the start',
+            'visible_end' => ':count characters shown at the end',
             'allow_negative' => 'allow negative',
             'no_negative' => 'no negative',
             'allow_zero' => 'allow 0',

@@ -16,6 +16,4 @@ use Amarenkov\MutableContent\Attributes\Field\Common\Label as FieldLabel;
 #[FieldLabel]
 class Owner extends ModelWithFields
 {
-    // static
-    protected static array|bool|null $fieldDefinitions = null;
 }

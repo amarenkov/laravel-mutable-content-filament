@@ -10,7 +10,6 @@ use Filament\Support\Icons\Heroicon;
 
 use function Filament\Support\generate_icon_html;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\HtmlString;
 
 use Filament\Tables\Table;

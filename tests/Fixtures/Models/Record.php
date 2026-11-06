@@ -46,6 +46,4 @@ class Record extends ModelWithFields
     #[CFAType(Type::TYPE_OBJECT), CFALabel('Owner'), CFAObjectClass(Owner::class)]
     public const FIELD_OWNER_ID = 'owner_id';
 
-    // static
-    protected static array|bool|null $fieldDefinitions = null;
 }

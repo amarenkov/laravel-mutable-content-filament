@@ -7,6 +7,10 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- The `secret` field type: a password input that never shows the value, the mask in tables and infolists, the settings of the visible characters.
+
 ## [0.8.3] - 2026-11-04
 
 ### Changed

@@ -41,6 +41,7 @@ use Amarenkov\MutableContent\Contracts\MutableModel;
 use Amarenkov\MutableContent\Domain\Field\Field;
 use Amarenkov\MutableContent\Domain\Field\Lov\Type as DomainFieldType;
 use Amarenkov\MutableContent\Domain\Field\TypeSettings;
+use Amarenkov\MutableContent\Domain\Field\Types\FieldTypes;
 use Amarenkov\MutableContent\Domain\LovRegistry;
 use Amarenkov\MutableContent\Domain\MutableClassDescription;
 
@@ -52,9 +53,7 @@ use Amarenkov\MutableContent\Models\ModelWithFields;
 use Amarenkov\MutableContent\Models\Lov\Currency;
 use Amarenkov\MutableContent\Rules\Money as MoneyRule;
 
-use Amarenkov\MutableContent\ValueObjects\Density;
 use Amarenkov\MutableContent\ValueObjects\Money;
-use Amarenkov\MutableContent\ValueObjects\SurfaceDensity;
 
 use Amarenkov\MutableContentFilament\Helpers\IconHelper;
 
@@ -221,6 +220,10 @@ class Resource extends BaseResource
                         ->suffix(__('mutable-content::units.kg_per_m2')), $field);
                     break;
 
+                case DomainFieldType::TYPE_SECRET:
+                    $component = static::secretFormComponent($field);
+                    break;
+
                 case DomainFieldType::TYPE_MONEY:
                     $component = static::moneyFormComponent($field, $usage->isRequired);
 
@@ -244,7 +247,7 @@ class Resource extends BaseResource
             }
 
             if ($usage->isRequired) {
-                $component->required();
+                $component->required($field->fieldType === DomainFieldType::TYPE_SECRET ? fn ($record) => !static::keepsSecret($record, $field->code) : true);
             }
 
             if ($usage->isImmutableForSystemObjects) {
@@ -331,23 +334,12 @@ class Resource extends BaseResource
                     break;
 
                 case DomainFieldType::TYPE_DENSITY:
-                    $component = TextEntry::make($field->code)->formatStateUsing(function ($state) {
-                        try {
-                            return Density::fromFieldValue($state)?->format();
-                        } catch (InvalidArgumentException) {
-                            return $state;
-                        }
-                    });
+                case DomainFieldType::TYPE_SURFACE_DENSITY:
+                    $component = TextEntry::make($field->code)->formatStateUsing(static::unitFormatter($field));
                     break;
 
-                case DomainFieldType::TYPE_SURFACE_DENSITY:
-                    $component = TextEntry::make($field->code)->formatStateUsing(function ($state) {
-                        try {
-                            return SurfaceDensity::fromFieldValue($state)?->format();
-                        } catch (InvalidArgumentException) {
-                            return $state;
-                        }
-                    });
+                case DomainFieldType::TYPE_SECRET:
+                    $component = TextEntry::make($field->code)->state(static::secretState($field));
                     break;
 
                 default:
@@ -448,6 +440,10 @@ class Resource extends BaseResource
 
                 case DomainFieldType::TYPE_MONEY:
                     $column = TextColumn::make($field->code)->state(static::moneyState($field))->alignEnd();
+                    break;
+
+                case DomainFieldType::TYPE_SECRET:
+                    $column = TextColumn::make($field->code)->state(static::secretState($field));
                     break;
 
                 case DomainFieldType::TYPE_ICON:
@@ -577,15 +573,33 @@ class Resource extends BaseResource
         return fn ($record) => $record instanceof MutableModel ? $record->getMoney($field->code)?->format(TypeSettings::decimals($field)) : null;
     }
 
-    protected static function displayUnit(Field $field): string
+    /**
+     * The form never shows a secret; an empty input keeps the current value.
+     */
+    protected static function secretFormComponent(Field $field): TextInput
     {
-        return TypeSettings::getValue($field, TypeSettings::DISPLAY_UNIT) ?? TypeSettings::getUnitClass($field->fieldType)::baseUnit();
+        return TextInput::make($field->code)
+            ->password()
+            ->formatStateUsing(fn () => null)
+            ->dehydrated(fn ($state) => filled($state))
+            ->placeholder(fn ($record) => static::keepsSecret($record, $field->code) ? $record->maskedSecret($field->code) : null)
+            ->helperText(fn ($record) => static::keepsSecret($record, $field->code) ? __('mutable-content-filament::ui.secret_kept') : null);
+    }
+
+    protected static function keepsSecret(mixed $record, string $code): bool
+    {
+        return $record instanceof MutableModel && filled($record->getField($code));
+    }
+
+    protected static function secretState(Field $field): Closure
+    {
+        return fn ($record) => $record instanceof MutableModel ? $record->maskedSecret($field->code) : null;
     }
 
     protected static function unitFormComponent(Field $field)
     {
         $class = TypeSettings::getUnitClass($field->fieldType);
-        $unit = static::displayUnit($field);
+        $unit = TypeSettings::displayUnit($field);
 
         $component = static::withSignRules(TextInput::make($field->code)
             ->numeric()
@@ -696,16 +710,7 @@ class Resource extends BaseResource
 
     protected static function unitFormatter(Field $field)
     {
-        $class = TypeSettings::getUnitClass($field->fieldType);
-        $unit = static::displayUnit($field);
-
-        return function ($state) use ($class, $unit) {
-            try {
-                return $class::fromFieldValue($state)?->format(unit: $unit);
-            } catch (InvalidArgumentException) {
-                return $state;
-            }
-        };
+        return fn ($state) => FieldTypes::display($field, $state) ?? $state;
     }
 
     protected static function objectFormComponent(Field $field)
@@ -863,25 +868,13 @@ class Resource extends BaseResource
      */
     protected static function unlistedCodesFilter(array $fields): ?TernaryFilter
     {
-        $codeFields = array_filter($fields, fn (Field $field) => in_array($field->fieldType, [DomainFieldType::TYPE_LOV_ITEM, DomainFieldType::TYPE_OBJECT], true) && TypeSettings::allowsUnlistedCodes($field));
+        $codeFields = ObjectHelper::fieldsWithUnlistedCodes($fields);
 
         if (!$codeFields) {
             return null;
         }
 
-        $hasUnlisted = function (Builder $query) use ($codeFields) {
-            $lovRegistry = app(LovRegistry::class);
-
-            foreach ($codeFields as $field) {
-                $column = 'fields->'.$field->code;
-
-                $codes = $field->fieldType === DomainFieldType::TYPE_OBJECT
-                    ? ObjectHelper::codesQuery($field->objectClass)
-                    : array_map('strval', array_keys($lovRegistry->getLovItemsOptions($field->lovCode)));
-
-                $query->orWhere(fn (Builder $query) => $query->whereNotNull($column)->whereNotIn($column, $codes));
-            }
-        };
+        $hasUnlisted = fn (Builder $query) => ObjectHelper::whereHasUnlistedCode($query, $codeFields);
 
         return TernaryFilter::make('unlisted_lov_codes')
             ->label(__('mutable-content-filament::ui.unlisted_codes_filter'))

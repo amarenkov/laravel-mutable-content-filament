@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'secret_kept' => 'Оставьте пустым, чтобы не менять',
     'navigation_group' => 'Системные настройки',
     'fields' => 'Поля',
     'lovs' => 'Справочники',
@@ -72,6 +73,9 @@ return [
         'decimals' => 'Знаков после запятой',
         'decimals_helper' => 'Сколько знаков хранит сумма вместо знаков валюты, например у цен за штуку.',
         'currency_decimals' => 'Как у валюты',
+        'visible_start' => 'Видно символов в начале',
+        'visible_end' => 'Видно символов в конце',
+        'visible_helper' => 'Остальное - звёздочками; короткий секрет скрыт целиком.',
 
         'format' => 'Формат',
         'format_helper' => 'Текст в Markdown редактируется редактором Markdown и показывается с заголовками, списками и ссылками.',
@@ -89,6 +93,8 @@ return [
             'listed_codes_only' => 'только коды из справочника',
             'currency' => 'валюта :currency',
             'decimals' => 'знаков после запятой: :decimals',
+            'visible_start' => 'видно в начале: :count',
+            'visible_end' => 'видно в конце: :count',
             'allow_negative' => 'разрешать минус',
             'no_negative' => 'без минуса',
             'allow_zero' => 'разрешать 0',

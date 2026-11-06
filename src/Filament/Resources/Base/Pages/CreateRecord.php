@@ -4,8 +4,6 @@ namespace Amarenkov\MutableContentFilament\Filament\Resources\Base\Pages;
 
 use Illuminate\Database\Eloquent\Model;
 
-use Filament\Actions\CreateAction;
-
 use Filament\Resources\Pages\CreateRecord as BaseCreateRecord;
 
 use Amarenkov\MutableContentFilament\Helpers\RequestHelper;

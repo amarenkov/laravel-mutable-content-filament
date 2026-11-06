@@ -18,7 +18,6 @@ use Amarenkov\MutableContent\Domain\LovRegistry;
 
 use Amarenkov\MutableContent\Models\Lov\Currency;
 
-
 use Amarenkov\MutableContent\ValueObjects\Money;
 
 /**
@@ -35,6 +34,8 @@ class FieldTypeSettingsComponents
     public const DECIMALS_STATE_PATH = Field::CODE_FIELD_TYPE_SETTINGS.'.'.TypeSettings::DECIMALS;
     public const LINK_BY_CODE_STATE_PATH = Field::CODE_FIELD_TYPE_SETTINGS.'.'.TypeSettings::LINK_BY_CODE;
     public const FORMAT_STATE_PATH = Field::CODE_FIELD_TYPE_SETTINGS.'.'.TypeSettings::FORMAT;
+    public const VISIBLE_START_STATE_PATH = Field::CODE_FIELD_TYPE_SETTINGS.'.'.TypeSettings::VISIBLE_START;
+    public const VISIBLE_END_STATE_PATH = Field::CODE_FIELD_TYPE_SETTINGS.'.'.TypeSettings::VISIBLE_END;
 
     protected const LINK_BY_CODE_LABEL = 'mutable-content-filament::ui.settings.link_by_code';
     protected const LINK_BY_CODE_HELPER = 'mutable-content-filament::ui.settings.link_by_code_helper';
@@ -64,6 +65,7 @@ class FieldTypeSettingsComponents
             + static::currencyComponents($fieldType, $inherited)
             + static::decimalsComponents($fieldType, $inherited)
             + static::formatComponents($fieldType, $inherited)
+            + static::visibleComponents($fieldType, $inherited)
             + static::signComponents($fieldType, $inherited);
     }
 
@@ -188,6 +190,40 @@ class FieldTypeSettingsComponents
             ->visible(fn (FormField $component) => (string)$component->evaluate($fieldType) === FieldType::TYPE_MONEY);
 
         return [$component->getName() => $component];
+    }
+
+    /**
+     * Characters of a secret shown at the start and at the end.
+     */
+    protected static function visibleComponents(Closure $fieldType, ?Closure $inherited): array
+    {
+        $values = array_map('strval', range(0, TypeSettings::MAX_VISIBLE));
+        $components = [];
+
+        foreach ([TypeSettings::VISIBLE_START => self::VISIBLE_START_STATE_PATH, TypeSettings::VISIBLE_END => self::VISIBLE_END_STATE_PATH] as $setting => $statePath) {
+            $component = Select::make($statePath)
+                ->label(__('mutable-content-filament::ui.settings.'.$setting))
+                ->helperText(__('mutable-content-filament::ui.settings.visible_helper'))
+                ->options(array_combine($values, $values))
+                ->placeholder(function (Select $component) use ($inherited, $setting) {
+                    $value = $inherited ? ($component->evaluate($inherited)[$setting] ?? null) : null;
+
+                    return is_int($value)
+                        ? __('mutable-content-filament::ui.settings.inherited', ['value' => $value])
+                        : __('mutable-content-filament::ui.settings.default', ['value' => TypeSettings::DEFAULT_VISIBLE]);
+                })
+                ->formatStateUsing(function (?MutableModel $record) use ($setting) {
+                    $value = $record?->getField(Field::CODE_FIELD_TYPE_SETTINGS)[$setting] ?? null;
+
+                    return is_int($value) ? (string)$value : null;
+                })
+                ->dehydrateStateUsing(fn ($state) => $state === null || $state === '' ? null : (int)$state)
+                ->visible(fn (FormField $component) => (string)$component->evaluate($fieldType) === FieldType::TYPE_SECRET);
+
+            $components[$component->getName()] = $component;
+        }
+
+        return $components;
     }
 
     /**
@@ -361,6 +397,14 @@ class FieldTypeSettingsComponents
 
         if ($fieldType === FieldType::TYPE_MONEY && is_int($decimals)) {
             $result[] = __('mutable-content-filament::ui.settings.describe.decimals', ['decimals' => $decimals]);
+        }
+
+        foreach ([TypeSettings::VISIBLE_START, TypeSettings::VISIBLE_END] as $setting) {
+            $visible = is_array($settings) || $settings instanceof ArrayAccess ? ($settings[$setting] ?? null) : null;
+
+            if ($fieldType === FieldType::TYPE_SECRET && is_int($visible)) {
+                $result[] = __('mutable-content-filament::ui.settings.describe.'.$setting, ['count' => $visible]);
+            }
         }
 
         if (static::hasSignSettings($fieldType)) {
